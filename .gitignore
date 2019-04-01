@@ -1,0 +1,10 @@
+.env
+*.env
+.idea/*
+*.DS_STORE
+venv/*
+*.pyc
+.project
+.pydevproject
+mysite/manage.py
+.vscode
