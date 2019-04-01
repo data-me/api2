@@ -1,0 +1,13 @@
+Django
+psycopg2
+djangorestframework
+python-dotenv
+djangorestframework_jwt
+django-cors-headers
+django-filter
+statsmodels
+scipy
+
+#Heroku requirements
+django-heroku
+gunicorn
