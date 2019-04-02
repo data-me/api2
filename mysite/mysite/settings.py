@@ -76,7 +76,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
 )
 
-BASEURL = 'https://api-datame.herokuapp.com'
+BASEURL = 'http://localhost:8000'
 
 ROOT_URLCONF = 'mysite.urls'
 

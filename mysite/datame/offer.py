@@ -49,7 +49,7 @@ class Offer_view(APIView):
             limit_time =  datetime.datetime(int(date[0]), int(date[1]), int(date[2]), int(hour[0]), int(hour[1]), 0, 0, pytz.UTC)
 
 
-            new_offer = Offer.objects.create(title=title, description=description, price_offered=float(price_offered), currency=currency, limit_time=limit_time, contract=contract, files=files, company = thisCompany)
+            new_offer = Offer.objects.create(title=title, description=description, price_offered=float(price_offered), limit_time=limit_time, contract=contract, files=files, company = thisCompany)
             
             
             print('La data que devuelve es: ' + str(data))
