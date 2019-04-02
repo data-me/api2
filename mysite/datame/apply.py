@@ -1,0 +1,87 @@
+import datetime
+from .models import *
+from django.http import JsonResponse
+from rest_framework.views import APIView
+from django.forms.models import model_to_dict
+
+
+class Apply_view(APIView):
+    def post(self, request, format=None):
+        try:
+            data = request.POST
+            title = data['title']
+            description = data['description']
+            date = datetime.datetime.utcnow()
+            user_logged = User.objects.all().get(pk = request.user.id)
+            if (not user_logged.groups.filter(name='DataScientist').exists()):
+                return JsonResponse({"message":"Only DataScientist can apply"})
+            dataScientist = DataScientist.objects.all().get(user = request.user)
+            offerId = data['offerId']
+            offer = Offer.objects.all().get(pk = offerId)
+            applysInOffer = Apply.objects.all().filter(offer = offer)
+            for apply in applysInOffer:
+                if(apply.dataScientist.id == dataScientist.id):
+                    return JsonResponse({"message":"DataScientist already applied"})
+            new_apply = Apply.objects.create(title=title, description=description, status='PE', date=date, dataScientist = dataScientist, offer = offer)
+            return JsonResponse({"message":"Successfully created new apply"})
+        except:
+            return JsonResponse({"message":"Oops, something went wrong"})
+    def get(self, request, format=None):
+        try:
+            user_logged = User.objects.all().get(pk = request.user.id)
+            if (user_logged.groups.filter(name='Company').exists()):
+                    thisCompany = Company.objects.all().get(user = request.user)
+                    offers = Offer.objects.all().filter(company = thisCompany).distinct()
+                    applys = []
+                    data = request.GET
+                    #filtro = data['filtro']
+                    #TODO Cuando se realice el login lo ideal es que no se le tenga que pasar la ID del principal, sino recuperarla mediante autentificacion
+
+                    for offer in offers:
+                        applysInOffer = Apply.objects.all().filter(offer = offer, status = 'PE').values()
+                        applysInOffer_2 = []
+                        for i in applysInOffer:
+                            i["DS_User_id"] = DataScientist.objects.filter(id=i["dataScientist_id"]).values_list()[0][1]
+                            applysInOffer_2.append(i)
+                        applys.extend(applysInOffer_2)
+
+                    return JsonResponse(list(applys), safe=False)
+            elif(user_logged.groups.filter(name='DataScientist').exists()):
+                    dataScientistRecuperado = DataScientist.objects.all().get(user = request.user)
+                    applys = []
+                    data = request.GET
+                    #TODO Cuando se realice el login lo ideal es que no se le tenga que pasar la ID del principal, sino recuperarla mediante autentificacion
+
+                    applys = Apply.objects.all().filter(dataScientist = dataScientistRecuperado).values()
+                    return JsonResponse(list(applys), safe=False)
+        except:
+            return JsonResponse({"message":"Oops, something went wrong"})
+
+# Accept/Reject contract
+
+class AcceptApply_view(APIView):
+    def post(self, request, format=None):
+        try:
+            user_logged = User.objects.all().get(pk = request.user.id)
+            if (user_logged.groups.filter(name='Company').exists()):
+                company = Company.objects.all().get(user = user_logged)
+                data = request.POST
+                idApply = data['idApply']
+                apply = Apply.objects.all().get(pk = idApply)
+                if(apply.offer.company == company):
+                    if (apply.offer.finished == True):
+                        res = JsonResponse({"message":"Offer has been already accepted"})
+                    else:
+                        applysToUpdate = Apply.objects.all().filter(offer = apply.offer).update(status = 'RE')
+                        apply.status = 'AC'
+                        apply.save()
+                        apply.offer.finished = True
+                        apply.offer.save()
+                        res = JsonResponse(model_to_dict(apply), safe=False)
+                else:
+                    res = JsonResponse({"message":"The company doesnt own the offer"})
+            else:
+                res = JsonResponse({"message":"Only companies can update an apply"})
+            return res
+        except:
+                return JsonResponse({"message":"Oops, something went wrong"})

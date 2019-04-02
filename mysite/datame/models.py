@@ -3,6 +3,7 @@ from django.contrib.auth.models import *
 from django import forms
 from django.utils import timezone
 from django.template.defaultfilters import default
+from django.db.models.fields.related import OneToOneField
 
 # Create your models here.
 
@@ -31,22 +32,35 @@ class DataScientist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField('Name', max_length = 30)
     surname = models.CharField('Surname', max_length = 50)
+    email = models.CharField('Email', max_length = 50)
+    photo = models.CharField('Photo', max_length = 100)
+    address = models.CharField('Address', max_length = 100)
+    phone = models.CharField('Phone', max_length = 9)
 
     def __str__(self):
         return self.name
+    
+class UserPlan(models.Model):
+    
+    TYPE_CHOICES = (
+        ('FREE', 'FREE'),
+        ('PRO', 'PRO'),
+    )
+    
+    dataScientist = models.OneToOneField(DataScientist, on_delete=models.CASCADE)
+    type = models.CharField('Type', max_length = 4, choices = TYPE_CHOICES)
+    expirationDate = models.DateTimeField(blank=True, null = True)
+
+    def __str__(self):
+        res = 'User Plan from ' + self.dataScientist.name
+        return res
 
 class Offer(models.Model):
-    CURRENCY_CHOICES = (
-        ('0', '€'),
-        ('1', '$'),
-        ('2', '£')
-    )
 
 
     title = models.CharField('Offer title', max_length = 80)
     description = models.TextField('Offer description')
     price_offered = models.FloatField('Price offered')
-    currency = models.CharField('Currency type',max_length = 1, choices = CURRENCY_CHOICES)
     creation_date = models.DateTimeField(auto_now_add=True)
     limit_time = models.DateTimeField(blank=True)
     finished = models.BooleanField(default=False)
@@ -56,6 +70,25 @@ class Offer(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Submition(models.Model):
+    
+    STATUS_CHOICES = (
+        ('SU', 'SUBMITTED'),
+        ('AC', 'ACEPTED'),
+        ('RE', 'REJECTED')
+    )
+    
+    dataScientist = models.ForeignKey(DataScientist, on_delete=models.CASCADE)
+    offer = models.OneToOneField(Offer, on_delete=models.CASCADE,)
+    file = models.CharField('File', max_length = 100)
+    comments = models.CharField('Comments', max_length = 100)
+    status = models.CharField('Status', max_length = 9, choices = STATUS_CHOICES)
+    
+
+    def __str__(self):
+        res = 'Submition ' + self.offer.title + ' from ' + self.dataScientist.name
+        return res
 
 class Apply(models.Model):
 
@@ -101,8 +134,8 @@ class Section(models.Model):
 class Item(models.Model):
     name = models.CharField("Name", max_length=50)
     section = models.ForeignKey("datame.Section", on_delete = models.CASCADE, related_name = 'items')
-    description = models.CharField("Description", max_length=100)
-    entity = models.CharField("Entity", max_length=50)
+    description = models.CharField("Description", max_length=500)
+    entity = models.CharField("Entity", max_length=50, blank=True,null=True)
     date_start = models.DateTimeField("Start date")
     date_finish = models.DateTimeField("End date", blank=True, null=True)
 
