@@ -37,7 +37,6 @@ class Offer_view(APIView):
             title = data['title']
             description = data['description']
             price_offered = data['price_offered']
-            currency = data['currency']
             limit_time = data['limit_time']
             contract = data['contract']
             files = data['files']
