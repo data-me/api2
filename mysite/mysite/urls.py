@@ -19,6 +19,7 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from datame.views import *
 from authentication import views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/login', obtain_jwt_token),
@@ -36,4 +37,5 @@ urlpatterns = [
     path('api/v1/company', Company_view.as_view()),
     path('api/v1/populate', populate),
     path('api/v1/whoami', whoami.as_view()),
+    path('api/v1/register', Register_view.as_view()),
 ]
