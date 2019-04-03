@@ -55,6 +55,7 @@ class Register_view(APIView):
                     res = JsonResponse({"message":"Sorry, username already exists"})
             else:
                 if (type == 'DS'):
+                    group = Group.objects.get(name = 'DataScientist')
                     surname = data['surname']
                     photo = data['photo']
                     address = data['address']
@@ -62,17 +63,20 @@ class Register_view(APIView):
                     email = data['email']
                     newUser = User.objects.create(username = username, password = password)
                     newUser.set_password(password)
+                    newUser.groups.add(group)
                     newUser.save()
                     newDs = DataScientist.objects.create(user = newUser, name = name, surname = surname, photo = photo, address = address,email = email, phone = phone)
                     CV.objects.create(owner = newDs)
                     res = JsonResponse({"message":"Successfully created new Data Scientist. Welcome!"})
                     
                 if (type == 'C'):
+                    group = Group.objects.get(name = 'Company')
                     description = data['description']
                     nif = data['nif']
                     logo = data['logo']
                     newUser = User.objects.create(username = username, password = password)
                     newUser.set_password(password)
+                    newUser.groups.add(group)
                     newUser.save()
                     newC = Company.objects.create(user = newUser, name = name, description = description, nif = nif, logo = logo)
                     res = JsonResponse({"message":"Successfully created Company. Welcome!"})
