@@ -56,3 +56,56 @@ class Offer_view(APIView):
             return JsonResponse({"message":"Successfully created new offer"})
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
+
+
+class Offer_admin_view(APIView):
+    def get(self, request, format=None):
+        try:
+            logged_user = request.user
+
+            if logged_user.is_superuser or logged_user.is_staff:
+
+                response = []
+
+                offers = Offer.objects.all().values()
+
+                for offer in offers:
+                    company = Company.objects.get(id = offer.get('company_id'))
+                    response.append({
+                        'offer_id' : str(offer.get('id')),
+                        'title' : str(offer.get('title')),
+                        'description' : str(offer.get('description')),
+                        'price_offered' : str(offer.get('price_offered')),
+                        'creation_date' : str(offer.get('creation_date')),
+                        'limit_date' : str(offer.get('limit_date')),
+                        'finished' : str(offer.get('finished')),
+                        'files' : str(offer.get('files')),
+                        'contract' : str(offer.get('contract')),
+                        'company_id' : str(offer.get('company_id')),
+                        'company_name' : company.name
+                    })
+
+                return JsonResponse(list(response), safe = False)
+
+            else:
+                return JsonResponse({"message":"Sorry! You don't have access to this resource..."})
+        
+        except:
+            return JsonResponse({"message":"Sorry! Something went wrong..."})
+    
+    def delete(self, request, format=None):
+        try:
+            logged_user = request.user
+
+            if logged_user.is_superuser or logged_user.is_staff:
+                offer = Offer.objects.get(id = request.POST.get('offer_id'))
+
+                message = Message.objects.create(receiver = offer.company.user, sender = logged_user, title = 'Your offer: ' + str(offer) + ', was deleted', body = 'Our administrators detected that your offer was in some way inappropriate')
+               
+                offer.delete()
+            
+            return JsonResponse({"message":"Successfuly deleted offer"})
+
+        except Exception as e:
+            return JsonResponse({"message" : str(e)})
+
