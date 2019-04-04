@@ -3,6 +3,7 @@ from .models import *
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from django.db.models import Q
+from django.http import HttpResponseNotFound
 
 
 
@@ -57,6 +58,22 @@ class Offer_view(APIView):
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
 
+    def delete (self, request, pk = None, format=None):
+        try:
+            if pk is None:
+                pk = self.kwargs['pk']
+            offer = Offer.objects.all().get(pk=pk)
+
+            thisCompany = Company.objects.all().get(user = request.user)
+            ofertasCompany = Offer.objects.all().filter(company = thisCompany).values()
+            if(ofertasCompany.filter(Q(title__contains =offer))):
+                offer.delete()
+                return JsonResponse({"message":"Successfully deleted offer"})
+            else:
+                return JsonResponse({"message":"You do not own this offer"})
+        except Exception as e:
+            print(e)
+            return JsonResponse({"message":"Sorry! Something went wrong..."})
 
 class Offer_admin_view(APIView):
     def get(self, request, format=None):
