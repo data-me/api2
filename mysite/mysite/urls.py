@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from datame.views import *
 from authentication import views
@@ -23,7 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/login', obtain_jwt_token),
     path('api/v1/refresh',refresh_jwt_token),
-    path('api/v1/offer', Offer_view.as_view()),
+    url('api/v1/offer', Offer_view.as_view()),
+    url(r'^api/v1/offer/(?P<pk>[0-9])', Offer_view.as_view()),
     path('api/v1/apply', Apply_view.as_view()),
     path('api/v1/accept', AcceptApply_view.as_view(),name='accept apply'),
     path('api/v1/helloworld', views.HelloWorld.as_view()),
