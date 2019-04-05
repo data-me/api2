@@ -3,6 +3,7 @@ from .models import *
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from django.db.models import Q
+from django.http import HttpResponseNotFound
 
 
 
@@ -13,6 +14,9 @@ class Offer_view(APIView):
             if data.get('search') != None:
                 date = datetime.datetime.utcnow()
                 ofertas = Offer.objects.filter(Q(title__contains = data['search']) | Q(description__contains = data['search']), limit_time__gte = date, finished=False).values()
+                return JsonResponse(list(ofertas), safe=False)
+            elif data.get('offerId') != None:
+                ofertas = Offer.objects.filter(id = data['offerId']).values()
                 return JsonResponse(list(ofertas), safe=False)
             else:
                 ofertas = []
@@ -49,14 +53,30 @@ class Offer_view(APIView):
 
 
             new_offer = Offer.objects.create(title=title, description=description, price_offered=float(price_offered), limit_time=limit_time, contract=contract, files=files, company = thisCompany)
-            
-            
+
+
             print('La data que devuelve es: ' + str(data))
             print('Sucessfully created new offer')
             return JsonResponse({"message":"Successfully created new offer"})
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
 
+    def delete (self, request, pk = None, format=None):
+        try:
+            if pk is None:
+                pk = self.kwargs['pk']
+            offer = Offer.objects.all().get(pk=pk)
+
+            thisCompany = Company.objects.all().get(user = request.user)
+            ofertasCompany = Offer.objects.all().filter(company = thisCompany).values()
+            if(ofertasCompany.filter(Q(title__contains =offer))):
+                offer.delete()
+                return JsonResponse({"message":"Successfully deleted offer"})
+            else:
+                return JsonResponse({"message":"You do not own this offer"})
+        except Exception as e:
+            print(e)
+            return JsonResponse({"message":"Sorry! Something went wrong..."})
 
 class Offer_admin_view(APIView):
     def get(self, request, format=None):
@@ -89,7 +109,7 @@ class Offer_admin_view(APIView):
 
             else:
                 return JsonResponse({"message":"Sorry! You don't have access to this resource..."})
-        
+
         except:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
     
@@ -103,11 +123,10 @@ class Offer_admin_view(APIView):
                 offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
 
                 message = Message.objects.create(receiver = offer.company.user, sender = logged_user, title = 'Your offer: ' + str(offer) + ', was deleted', body = 'Our administrators detected that your offer was in some way inappropriate')
-               
+
                 offer.delete()
-            
+
             return JsonResponse({"message":"Successfuly deleted offer"})
 
         except Exception as e:
             return JsonResponse({"message" : str(e)})
-
