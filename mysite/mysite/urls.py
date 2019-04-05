@@ -39,5 +39,5 @@ urlpatterns = [
     path('api/v1/whoami', whoami.as_view()),
     path('api/v1/register', Register_view.as_view()),
     path('api/v2/admin/offers', Offer_admin_view.as_view()),
-    path('api/v2/admin/delete_offer', Offer_admin_view.as_view()),
+    path('api/v2/admin/delete_offer/<offer_id>', Offer_admin_view.as_view()),
 ]

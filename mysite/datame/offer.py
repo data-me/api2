@@ -93,12 +93,14 @@ class Offer_admin_view(APIView):
         except:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
     
-    def delete(self, request, format=None):
+    def delete(self, request, offer_id, format=None):
         try:
             logged_user = request.user
 
             if logged_user.is_superuser or logged_user.is_staff:
-                offer = Offer.objects.get(id = request.POST.get('offer_id'))
+                lookup_url_kwarg = "offer_id"
+
+                offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
 
                 message = Message.objects.create(receiver = offer.company.user, sender = logged_user, title = 'Your offer: ' + str(offer) + ', was deleted', body = 'Our administrators detected that your offer was in some way inappropriate')
                
