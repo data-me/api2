@@ -153,7 +153,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_PREFLIGHT_MAX_AGE = 0
 
-CORS_URLS_REGEX = r'^/api/v1/.*$'
+CORS_URLS_REGEX = r'^/api/v.*$'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

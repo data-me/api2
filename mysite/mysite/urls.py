@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/v1/login', obtain_jwt_token),
     path('api/v1/refresh',refresh_jwt_token),
     url('api/v1/offer', Offer_view.as_view()),
-    #url(r'^api/v1/offer/(?P<pk>[0-9])', Offer_view.as_view()),
+    path('api/v1/company/offer/<offer_id>', Offer_view.as_view()),
     path('api/v1/apply', Apply_view.as_view()),
     path('api/v1/accept', AcceptApply_view.as_view(),name='accept apply'),
     path('api/v1/helloworld', views.HelloWorld.as_view()),
@@ -44,5 +44,5 @@ urlpatterns = [
     path('api/v1/submit', Submition_view.as_view()),
     path('api/v2/admin/offers', Offer_admin_view.as_view()),
     path('api/v2/admin/delete_offer', Offer_admin_view.as_view()),
-    path('api/v1/company/offer/<offer_id>', Offer_view.as_view()),
+    path('api/v2/admin/delete_offer/<offer_id>', Offer_admin_view.as_view()),
 ]
