@@ -43,7 +43,7 @@ class Company_view(APIView):
 
 
 class Register_view(APIView):
-    permission_classes = (~IsAuthenticated,)
+    #permission_classes = (~IsAuthenticated,)
     def post(self, request, format=None):
         try:
             data = request.POST

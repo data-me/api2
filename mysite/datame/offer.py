@@ -61,15 +61,16 @@ class Offer_view(APIView):
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
 
-    def delete (self, request, pk = None, format=None):
+    def delete (self, request, offer_id, format=None):
         try:
-            if pk is None:
-                pk = self.kwargs['pk']
-            offer = Offer.objects.all().get(pk=pk)
 
             thisCompany = Company.objects.all().get(user = request.user)
             ofertasCompany = Offer.objects.all().filter(company = thisCompany).values()
-            if(ofertasCompany.filter(Q(title__contains =offer))):
+            
+            lookup_url_kwarg = "offer_id"
+            offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
+            
+            if(thisCompany == offer.company):
                 offer.delete()
                 return JsonResponse({"message":"Successfully deleted offer"})
             else:
@@ -77,6 +78,7 @@ class Offer_view(APIView):
         except Exception as e:
             print(e)
             return JsonResponse({"message":"Sorry! Something went wrong..."})
+    
 
 class Offer_admin_view(APIView):
     def get(self, request, format=None):
