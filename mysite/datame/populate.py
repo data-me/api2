@@ -92,10 +92,10 @@ def populate(request):
         item4 = Item.objects.create(name='Engineer in Endesa', section=section3, description="I've work in Endesa since 2013. I was in charge the data from the bills.",
                                     entity = 'Ensesa',date_start=datetime.datetime(2013,3,11,23,13,0,0,pytz.UTC), date_finish= datetime.datetime(2017,1,2,23,13,0,0,pytz.UTC))
         
-        message1 = Message.objects.create(receiver = data1, sender = admin, title = "Welcome!", body= "Welcome to DataMe!")
-        message2 = Message.objects.create(receiver = data2, sender = admin, title = "Welcome!", body= "Welcome to DataMe!")
-        message3 = Message.objects.create(receiver = company1, sender = admin, title = "Welcome!", body= "Welcome to DataMe!")
-        message4 = Message.objects.create(receiver = company2, sender = admin, title = "Welcome!", body= "Welcome to DataMe!")
+        message1 = Message.objects.create(receiver = data1, sender = admin, title = "Welcome!", body= "Welcome to DataMe!", isAlert=False)
+        message2 = Message.objects.create(receiver = data2, sender = admin, title = "Welcome!", body= "Welcome to DataMe!", isAlert=False)
+        message3 = Message.objects.create(receiver = company1, sender = admin, title = "Welcome!", body= "Welcome to DataMe!", isAlert=False)
+        message4 = Message.objects.create(receiver = company2, sender = admin, title = "Welcome!", body= "Welcome to DataMe!", isAlert=False)
        
         return JsonResponse({'message': 'DB populated'})
     except Exception as e:

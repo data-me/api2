@@ -13,11 +13,12 @@ class Message_view(APIView):
             moment = datetime.datetime.utcnow()
             #receiverId = User.objects.all().get(user = data['receiverId'])
             username = data['username']
+            isAlert = False
             receiver = User.objects.all().get(username = username)
             senderId = request.user
-            print(senderId)
+            print('Messager senderId =>', senderId)
 
-            new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId)
+            new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
 
             print('Sucessfully created new message')
             return JsonResponse({"message":"Successfully created new message"})
