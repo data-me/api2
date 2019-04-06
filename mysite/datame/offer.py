@@ -71,7 +71,6 @@ class Offer_view(APIView):
             new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
 
             print('Sucessfully created new alert message')
-            return JsonResponse({"message":"Successfully created new offer"})
             return JsonResponse({"message":"Successfully created new offer","offer_id":new_offer.id})
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
