@@ -43,13 +43,13 @@ class DataScientist(models.Model):
 class UserPlan(models.Model):
     
     TYPE_CHOICES = (
-        ('FREE', 'FREE'),
         ('PRO', 'PRO'),
     )
     
-    dataScientist = models.OneToOneField(DataScientist, on_delete=models.CASCADE)
+    dataScientist = models.ForeignKey(DataScientist, on_delete=models.CASCADE)
     type = models.CharField('Type', max_length = 4, choices = TYPE_CHOICES)
-    expirationDate = models.DateTimeField(blank=True, null = True)
+    startDate = models.DateTimeField(null = True)
+    expirationDate = models.DateTimeField(null = True)
 
     def __str__(self):
         res = 'User Plan from ' + self.dataScientist.name
