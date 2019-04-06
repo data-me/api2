@@ -48,5 +48,8 @@ urlpatterns = [
     path('api/v2/admin/delete_offer/<offer_id>', Offer_admin_view.as_view()),
     path('api/v1/users',User_view.as_view()),
     path('api/v1/companies',Companies_view.as_view()),
-    path('api/v1/applications',Applications_view.as_view())
+    path('api/v1/applications',Applications_view.as_view()),
+    path('api/v1/applicationsAccepted',ApplicationsAccepted_view.as_view()),
+    path('api/v1/submitions',Submitions_view.as_view()),
+    path('api/v1/messages',Messages_view.as_view())
 ]
