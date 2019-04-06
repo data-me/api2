@@ -19,6 +19,7 @@ from django.conf.urls import url
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from datame.views import *
 from authentication import views
+from django.conf.urls import include, url
 
 
 urlpatterns = [
@@ -48,8 +49,9 @@ urlpatterns = [
     path('api/v2/admin/delete_offer/<offer_id>', Offer_admin_view.as_view()),
     path('api/v1/users',User_view.as_view()),
     path('api/v1/companies',Companies_view.as_view()),
-    path('api/v1/applications',Applications_view.as_view()),
     path('api/v1/applicationsAccepted',ApplicationsAccepted_view.as_view()),
     path('api/v1/submitions',Submitions_view.as_view()),
-    path('api/v1/messages',Messages_view.as_view())
+    path('api/v1/messages',Messages_view.as_view()),
+    path('api/v1/applications',Applications_view.as_view()),
+    url(r'api/v1/pagos/', include('pagos.urls')),
 ]
