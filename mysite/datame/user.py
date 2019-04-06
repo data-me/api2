@@ -4,22 +4,40 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
+#para dashboard de admin
 class User_view(APIView):
     def get(self, request, format=None):
         try:
             data = request.GET
             user = request.user
             users = []
-            try:
-                users = User.objects.all().values('username')
-                print(users)
-            except:
-                print("There are no users")
+            if (user.is_superuser or user.is_staff):
+                try:
+                    users = User.objects.all().values('username')
+                    print(users)
+                except:
+                    print("There are no users")
 
-            return JsonResponse(list(users), safe=False)
+                return JsonResponse(list(users), safe=False)
         except:
             return JsonResponse({"message":"Oops, something went wrong"})
 
+#para dashboard de admin
+class Companies_view(APIView):
+    def get(self, request, format=None):
+        try:
+            data = request.GET
+            user = request.user
+            companies = []
+            if (user.is_superuser or user.is_staff):
+                try:
+                    companies = Company.objects.all().values('name')
+                except:
+                    print("There are no companies")
+
+                return JsonResponse(list(companies), safe=False)
+        except:
+            return JsonResponse({"message":"Oops, something went wrong"})
 
 class Company_view(APIView):
     def get(self, request, format=None):
@@ -94,4 +112,9 @@ class whoami(APIView):
                     request.user.company
                     return JsonResponse({'user_type': 'com'})
                 except:
-                    return JsonResponse({'user_type': 'None'})
+                    try:
+                        user_logged = request.user
+                        if(user_logged.is_superuser or user_logged.is_staff):
+                            return JsonResponse({'user_type': 'admin'})
+                    except:
+                        return JsonResponse({'user_type': 'None'})
