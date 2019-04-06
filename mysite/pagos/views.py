@@ -20,8 +20,6 @@ import paypalrestsdk
 
 
 class PaypalView(APIView):
-    permanent = False
-
     def _generar_lista_items(self, offer):
         """ """
         items = []
@@ -41,7 +39,7 @@ class PaypalView(APIView):
             "payer": {"payment_method": "paypal"},
             "redirect_urls": {
                 # "return_url": settings.SITE_URL + reverse('aceptar-pago-paypal'),
-                "return_url": settings.SITE_URL,
+                "return_url": settings.SITE_URL + "offer_paypal_accepted",
                 "cancel_url": settings.SITE_URL},
 
             # Transaction -
@@ -121,4 +119,33 @@ class PaypalView(APIView):
         # url_dict = get_redirect_url(kwargs = data)
 
         return JsonResponse(res)
+
+#
+class AcceptPaypalView(APIView):
+
+    def _aceptar_pago_paypal(self, payment_id, payer_id):
+        """Aceptar el pago del cliente, actualiza el registro con los datos
+        del cliente proporcionados por paypal"""
+        registro_pago = get_object_or_404(OfferPaypalBill, payment_id=payment_id)
+        pago_paypal = paypalrestsdk.Payment.find(payment_id)
+        if pago_paypal.execute({'payer_id': payer_id}):
+            registro_pago.pagado = True
+            registro_pago.payer_id = payer_id
+            registro_pago.payer_email = pago_paypal.payer['payer_info']['email']
+            registro_pago.save()
+        else:
+            raise HttpResponseBadRequest
+
+        return registro_pago
+
+    def get(self, request,paymentId,token_paypal,payerID,format=None):
+
+        try:
+            registro_pago = self._aceptar_pago_paypal(paymentId, payerID)
+
+            res = {"message": "Offer created! "}
+            return JsonResponse(res)
+        except:
+            res = {"message":"Oops, something went wrong"}
+            return JsonResponse(res)
 
