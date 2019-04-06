@@ -53,6 +53,6 @@ class Offer_view(APIView):
             
             print('La data que devuelve es: ' + str(data))
             print('Sucessfully created new offer')
-            return JsonResponse({"message":"Successfully created new offer"})
+            return JsonResponse({"message":"Successfully created new offer","offer_id":new_offer.id})
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})

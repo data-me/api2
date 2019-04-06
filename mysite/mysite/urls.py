@@ -18,6 +18,7 @@ from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from datame.views import *
 from authentication import views
+from django.conf.urls import include, url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,4 +37,5 @@ urlpatterns = [
     path('api/v1/company', Company_view.as_view()),
     path('api/v1/populate', populate),
     path('api/v1/whoami', whoami.as_view()),
+    url(r'api/v1/pagos/', include('pagos.urls')),
 ]
