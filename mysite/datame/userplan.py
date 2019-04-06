@@ -2,6 +2,8 @@ from .models import *
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from datetime import datetime, timedelta
+import traceback
+import pytz
 
 class userPlanHistory(APIView):
     def get(self, request, format=None):
@@ -48,22 +50,36 @@ class currentUserPlan(APIView):
             except:
                 return JsonResponse({"message": "Sorry, there was a problem retrieving the Data Scientist"})
             try:
-                userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate').values()
+                print('Second Try')
+                userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate')
+                print('Querying... ' + str( userPlanHistory ))
+                response['dataScientistId'] = dataScientist.id
+                print('Is there a saved user plan?' + str(userPlanHistory.count()))
                 if 0 < userPlanHistory.count():
+                    print('There is at least one userPlan payment.')
                     currentUserPlan = userPlanHistory.first()
-                response['dataScientistId']=dataScientist.id
-                if currentUserPlan is None or currentUserPlan.expirationDate < datetime.now():
+                    print('The currentUserPlan was assigned.')
+
+                print('Any problem reaching the ifs?')
+                print('Structure of a UserPlan' + str(currentUserPlan))
+                print('Is current userPlan None' + str(currentUserPlan is None))
+                try:
+                    print('currentUserPlan is expired? ' + str(currentUserPlan.expirationDate < datetime.now(pytz.utc)))
+                except:
+                    traceback.print_exc()
+                print('Is current userPlan None or currentUserPlan is expired? ' + str(currentUserPlan is None or currentUserPlan.expirationDate < datetime.datetime.now()))
+                if currentUserPlan is None or currentUserPlan.expirationDate < datetime.now(pytz.utc):
+                    print('The case when is a FREE user')
                     response['currentUserPlan'] = 'FREE'
                     response['expirationDate'] = ''
                     response['startDate'] = ''
-                elif currentUserPlan is not None and  datetime.now() < currentUserPlan.expirationDate:
+                elif (currentUserPlan is not None and datetime.now() < currentUserPlan.expirationDate):
+                    print('The case when is a PRO user' + str(currentUserPlan))
                     response['currentUserPlan'] = 'PRO'
                     response['expirationDate'] = str(currentUserPlan.expirationDate)
                     response['startDate'] = str(currentUserPlan.startDate)
                 else:
-                    response['currentUserPlan'] = ''
-                    response['expirationDate'] = ''
-                    response['startDate'] = ''
+                    response['message'] = 'Oops, something went wrong'
             except:
                 return JsonResponse({"message": "Oops, something went wrong"})
 
