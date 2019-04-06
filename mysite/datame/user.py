@@ -86,6 +86,21 @@ class Register_view(APIView):
                     newDs = DataScientist.objects.create(user = newUser, name = name, surname = surname, photo = photo, address = address,email = email, phone = phone)
                     CV.objects.create(owner = newDs)
                     res = JsonResponse({"message":"Successfully created new Data Scientist. Welcome!"})
+
+                    print('Creating a NEW DS alert message for adming user')
+            
+                    # Alert message
+                    title = '[ALERT MESSAGE] New data scientist was registered'
+                    body = 'Data scientist with DsID: '+str(newDs.id)+' was registered'
+                    moment = datetime.datetime.utcnow()
+                    username = 'admin'
+                    isAlert = True
+                    receiver = User.objects.all().get(username = username)
+                    senderId = request.user
+
+                    new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
+
+                    print('Sucessfully created new alert message')
                     
                 if (type == 'C'):
                     group = Group.objects.get(name = 'Company')
@@ -98,6 +113,21 @@ class Register_view(APIView):
                     newUser.save()
                     newC = Company.objects.create(user = newUser, name = name, description = description, nif = nif, logo = logo)
                     res = JsonResponse({"message":"Successfully created Company. Welcome!"})
+
+                    print('Creating a NEW COMPANY alert message for adming user')
+            
+                    # Alert message
+                    title = '[ALERT MESSAGE] New company was registered'
+                    body = 'Company with CompanyID: '+str(newC.id)+' was registered'
+                    moment = datetime.datetime.utcnow()
+                    username = 'admin'
+                    isAlert = True
+                    receiver = User.objects.all().get(username = username)
+                    senderId = request.user
+
+                    new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
+
+                    print('Sucessfully created new alert message')
             return res
         except Exception as e:
             return JsonResponse({"message":"Oops, something went wrong" + str(e)})

@@ -57,6 +57,20 @@ class Offer_view(APIView):
 
             print('La data que devuelve es: ' + str(data))
             print('Sucessfully created new offer')
+            print('Creating a NEW OFFER alert message for adming user')
+            
+            # Alert message
+            title = '[ALERT MESSAGE] New offer was created'
+            body = 'Company with CompanyID: '+str(thisCompany.id)+' created new offer with OfferID: '+str(new_offer.id) +' and using title: '+str(new_offer.title)
+            moment = datetime.datetime.utcnow()
+            username = 'admin'
+            isAlert = True
+            receiver = User.objects.all().get(username = username)
+            senderId = request.user
+
+            new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
+
+            print('Sucessfully created new alert message')
             return JsonResponse({"message":"Successfully created new offer"})
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
