@@ -4,6 +4,22 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from django.forms.models import model_to_dict
 
+#para el admin
+class Applications_view(APIView):
+    def get(self, request, format=None):
+        try:
+            
+            user_logged = User.objects.all().get(pk = request.user.id)
+            applications = []
+            if (user_logged.is_superuser or user_logged.is_staff):
+                try:
+                    applications = Apply.objects.all().values()
+                except:
+                    print("There are no users")
+                return JsonResponse(list(applications), safe=False)
+        except:
+            return JsonResponse({"message":"Oops, something went wrong"})
+
 
 class Apply_view(APIView):
     def post(self, request, format=None):

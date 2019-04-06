@@ -15,16 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from datame.views import *
 from authentication import views
 from django.conf.urls import include, url
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/login', obtain_jwt_token),
     path('api/v1/refresh',refresh_jwt_token),
-    path('api/v1/offer', Offer_view.as_view()),
+    url('api/v1/offer', Offer_view.as_view()),
+    path('api/v1/company/offer/<offer_id>', Offer_view.as_view()),
     path('api/v1/apply', Apply_view.as_view()),
     path('api/v1/accept', AcceptApply_view.as_view(),name='accept apply'),
     path('api/v1/helloworld', views.HelloWorld.as_view()),
@@ -37,5 +40,15 @@ urlpatterns = [
     path('api/v1/company', Company_view.as_view()),
     path('api/v1/populate', populate),
     path('api/v1/whoami', whoami.as_view()),
+    path('api/v1/register', Register_view.as_view()),
+    path('api/v1/check_submition', Check_submition.as_view()),
+    path('api/v1/submit', Submition_view.as_view()),
+    path('api/v1/change_status', Change_status.as_view()),
+    path('api/v2/admin/offers', Offer_admin_view.as_view()),
+    path('api/v2/admin/delete_offer', Offer_admin_view.as_view()),
+    path('api/v2/admin/delete_offer/<offer_id>', Offer_admin_view.as_view()),
+    path('api/v1/users',User_view.as_view()),
+    path('api/v1/companies',Companies_view.as_view()),
+    path('api/v1/applications',Applications_view.as_view())
     url(r'api/v1/pagos/', include('pagos.urls')),
 ]
