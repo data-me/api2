@@ -15,11 +15,25 @@ class Applications_view(APIView):
                 try:
                     applications = Apply.objects.all().values()
                 except:
-                    print("There are no users")
+                    print("There are no applications")
                 return JsonResponse(list(applications), safe=False)
         except:
             return JsonResponse({"message":"Oops, something went wrong"})
-
+#para el admin
+class ApplicationsAccepted_view(APIView):
+    def get(self, request, format=None):
+        try:
+            
+            user_logged = User.objects.all().get(pk = request.user.id)
+            applicationsAccepted = []
+            if (user_logged.is_superuser or user_logged.is_staff):
+                try:
+                    applicationsAccepted = Apply.objects.all().filter(status = 'AC').values()
+                except:
+                    print("There are no applications accepted")
+                return JsonResponse(list(applicationsAccepted), safe=False)
+        except:
+            return JsonResponse({"message":"Oops, something went wrong"})
 
 class Apply_view(APIView):
     def post(self, request, format=None):

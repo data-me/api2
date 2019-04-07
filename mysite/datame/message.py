@@ -4,6 +4,18 @@ from django.http import JsonResponse
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
+#para dashboard
+class Messages_view(APIView):
+    def get(self, request, format=None):
+        user_logged = User.objects.all().get(pk = request.user.id)
+        if (user_logged.is_superuser or user_logged.is_staff):
+            try:    
+                messages = Message.objects.all().values()
+                return JsonResponse(list(messages), safe=False)
+            except:
+                print("there are no messages")
+        return JsonResponse({"message":"Oops, something went wrong"})
+
 class Message_view(APIView):
     def post(self, request, format=None):
         try:
