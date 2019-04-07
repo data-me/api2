@@ -83,10 +83,14 @@ class Offer_view(APIView):
             
             lookup_url_kwarg = "offer_id"
             offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
-            
             if(thisCompany == offer.company):
-                offer.delete()
-                return JsonResponse({"message":"Successfully deleted offer"})
+                try:
+                    applies = Apply.objects.all().values(offer = offer)
+                    if(applies != None):
+                        offer.delete()
+                        return JsonResponse({"message":"Successfully deleted offer"})
+                except:
+                    return JsonResponse({"message":"This offer has at least one application"})
             else:
                 return JsonResponse({"message":"You do not own this offer"})
         except Exception as e:
