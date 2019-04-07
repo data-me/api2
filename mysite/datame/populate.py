@@ -34,8 +34,7 @@ def populate(request):
         photo='https://media.istockphoto.com/photos/portrait-of-a-german-businessman-with-beard-picture-id480286744',
         address='C/Cristo del Amor Number 21',phone='955766587')
         
-        userPlan1 = UserPlan.objects.create(type='PRO',dataScientist=dataScientist1,expirationDate=datetime.datetime(2020,7,12,21,0,0,0,pytz.UTC))
-        userPlan2 = UserPlan.objects.create(type='FREE',dataScientist=dataScientist2,expirationDate=None)
+        userPlan1 = UserPlan.objects.create(type='PRO',dataScientist=dataScientist1,startDate=datetime.datetime(2019,1,1,0,0,0,0,pytz.UTC),expirationDate=datetime.datetime(2020,1,1,0,0,0,0,pytz.UTC))
 
         company01 = Company.objects.create(user = company1, name = 'Company 1', description = 'Description 1',nif = 'nif1', logo = 'www.company1.com')
         company02 = Company.objects.create(user = company2, name = 'Company 2', description = 'Description 2',nif = 'nif2', logo = 'www.company2.com')
