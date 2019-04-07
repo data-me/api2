@@ -54,4 +54,12 @@ urlpatterns = [
     path('api/v1/messages',Messages_view.as_view()),
     path('api/v1/applications',Applications_view.as_view()),
     url(r'api/v1/pagos/', include('pagos.urls')),
+    path('api/v2/currentUserPlan', currentUserPlan.as_view()),
+    path('api/v2/userPlanHistory', userPlanHistory.as_view()),
+    path('api/v2/payUserPlan', payUserPlan.as_view()),
+    path('api/v2/list_dataScientists', list_dataScientists.as_view()),
+    path('api/v2/list_companies', list_companies.as_view()),
+    path('api/v2/list_companies', list_staff.as_view()),
+    path('api/v2/delete_user', delete_user.as_view()),
+
 ]

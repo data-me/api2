@@ -7,6 +7,8 @@ django-cors-headers
 django-filter
 statsmodels
 scipy
+paypalrestsdk
+python-dateutil
 
 #Heroku requirements
 django-heroku

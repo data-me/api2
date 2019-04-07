@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+import traceback
 
 #para dashboard de admin
 class User_view(APIView):
@@ -131,6 +132,62 @@ class Register_view(APIView):
             return res
         except Exception as e:
             return JsonResponse({"message":"Oops, something went wrong" + str(e)})
+
+class list_dataScientists(APIView):
+    def get(self, request, format=None):
+        if request.method == "GET":
+            logged_user = User.objects.all().get(pk=request.user.id)
+            try:
+                if not logged_user.is_staff:
+                    return JsonResponse({"message": "Sorry! Only an administrator can list all data scientists."})
+                dataScientist_list = DataScientist.objects.all().values()
+
+            except:
+                traceback.print_exc()
+                return JsonResponse({"message": "Sorry! Something went wrong..."})
+            return JsonResponse(list(dataScientist_list), safe=False)
+
+class list_companies(APIView):
+    def get(self, request, format=None):
+        if request.method == "GET":
+            logged_user = User.objects.all().get(pk=request.user.id)
+            try:
+                if not logged_user.is_staff:
+                    return JsonResponse({"message": "Sorry! Only an administrator can list all companies."})
+                companies_list = Company.objects.all().values()
+
+            except:
+                traceback.print_exc()
+                return JsonResponse({"message": "Sorry! Something went wrong..."})
+            return JsonResponse(list(companies_list), safe=False)
+class list_staff(APIView):
+    def get(self, request, format=None):
+        if request.method == "GET":
+            logged_user = User.objects.all().get(pk=request.user.id)
+            try:
+                if not logged_user.is_staff:
+                    return JsonResponse({"message": "Sorry! Only an administrator can list all staff."})
+                staf_list = User.objects.filter(is_staff=True).values()
+
+            except:
+                traceback.print_exc()
+                return JsonResponse({"message": "Sorry! Something went wrong..."})
+            return JsonResponse(list(staf_list), safe=False)
+class delete_user(APIView):
+    def post(self, request, format=None):
+        try:
+            logged_user = User.objects.all().get(pk=request.user.id)
+            if not logged_user.is_staff:
+                return JsonResponse({"message": "Sorry! Only an administrator can delete users."})
+            user_id = request.POST['user_id']
+            userToDelete = User.objects.get(pk=user_id)
+            userToDelete.delete()
+            return JsonResponse({"message": "Successfully deleted user"})
+        except:
+            traceback.print_exc()
+            return JsonResponse({"message": "Sorry! Something went wrong deleting a user..."})
+
+
 
 class whoami(APIView):
     def get(self, request, format=None):
