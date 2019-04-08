@@ -2,9 +2,9 @@ from .models import *
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, NOT
 import traceback
-
+import datetime
 #para dashboard de admin
 class User_view(APIView):
     def get(self, request, format=None):
@@ -62,7 +62,7 @@ class Company_view(APIView):
 
 
 class Register_view(APIView):
-    #permission_classes = (~IsAuthenticated,)
+    permission_classes = (~IsAuthenticated,)
     def post(self, request, format=None):
         try:
             data = request.POST
@@ -97,7 +97,7 @@ class Register_view(APIView):
                     username = 'admin'
                     isAlert = True
                     receiver = User.objects.all().get(username = username)
-                    senderId = request.user
+                    senderId = newUser
 
                     new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
 
@@ -124,7 +124,7 @@ class Register_view(APIView):
                     username = 'admin'
                     isAlert = True
                     receiver = User.objects.all().get(username = username)
-                    senderId = request.user
+                    senderId = newUser
 
                     new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
 
