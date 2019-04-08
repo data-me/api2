@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, NOT
 import traceback
 import datetime
+from django.forms.models import model_to_dict
 #para dashboard de admin
 class User_view(APIView):
     def get(self, request, format=None):
@@ -186,6 +187,35 @@ class delete_user(APIView):
         except:
             traceback.print_exc()
             return JsonResponse({"message": "Sorry! Something went wrong deleting a user..."})
+
+class change_info(APIView):
+    def post(self, request, format=None):
+        try:
+            data = request.POST
+            name = data['name']
+            surname = data['surname']
+            email = data ['email']
+            photo = data ['photo']
+            address = data ['address']
+            phone = data ['phone']
+            user_logged = User.objects.all().get(pk = request.user.id)
+            DataScientist.objects.all().filter(user = user_logged).update(name = name, surname = surname, email = email, photo = photo, address = address, phone = phone)
+            return JsonResponse({"message": "User updated"})
+        except Exception as e:
+            return JsonResponse({"message": "Sorryyyy! Something went wrong..." + str(e)})
+
+class get_user_logged(APIView):
+    def get(self, request, format=None):
+        try:
+            user_logged = User.objects.all().get(pk = request.user.id)
+            if (user_logged.groups.filter(name='DataScientist').exists()):
+                res = DataScientist.objects.all().get(user = user_logged)
+            elif(user_logged.groups.filter(name='Company').exists()):
+                res = Company.objects.all().get(user = user_logged)
+            
+            return JsonResponse(model_to_dict(res), safe = False)
+        except Exception as e:
+            return JsonResponse({"message": "Sorry! Something went wrong..." + str(e)})
 
 
 
