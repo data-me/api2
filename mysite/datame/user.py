@@ -53,9 +53,10 @@ class Company_view(APIView):
                     thiscompany = Company.objects.all().filter(user = logged_user).values()
             except:
                     companyId = data['companyId']
-                    companyUserRecuperado = User.objects.all().get(pk = companyId)
-                    print('company user recuperada: ' + str(companyUserRecuperado))
-                    thiscompany = Company.objects.all().filter(user = companyUserRecuperado).values()
+                    print('companyId: ' + str(companyId))
+                    #companyUserRecuperado = User.objects.all().get(pk = companyId)
+                    #print('company user recuperada: ' + str(companyUserRecuperado))
+                    thiscompany = Company.objects.all().filter(pk = companyId).values()
                     print('company recuperada: ' + str(thiscompany))
 
 
@@ -90,7 +91,7 @@ class Register_view(APIView):
                     res = JsonResponse({"message":"Successfully created new Data Scientist. Welcome!"})
 
                     print('Creating a NEW DS alert message for adming user')
-            
+
                     # Alert message
                     title = '[ALERT MESSAGE] New data scientist was registered'
                     body = 'Data scientist with DsID: '+str(newDs.id)+' was registered'
@@ -103,7 +104,7 @@ class Register_view(APIView):
                     new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
 
                     print('Sucessfully created new alert message')
-                    
+
                 if (type == 'C'):
                     group = Group.objects.get(name = 'Company')
                     description = data['description']
@@ -117,7 +118,7 @@ class Register_view(APIView):
                     res = JsonResponse({"message":"Successfully created Company. Welcome!"})
 
                     print('Creating a NEW COMPANY alert message for adming user')
-            
+
                     # Alert message
                     title = '[ALERT MESSAGE] New company was registered'
                     body = 'Company with CompanyID: '+str(newC.id)+' was registered'
@@ -212,7 +213,7 @@ class get_user_logged(APIView):
                 res = DataScientist.objects.all().get(user = user_logged)
             elif(user_logged.groups.filter(name='Company').exists()):
                 res = Company.objects.all().get(user = user_logged)
-            
+
             return JsonResponse(model_to_dict(res), safe = False)
         except Exception as e:
             return JsonResponse({"message": "Sorry! Something went wrong..." + str(e)})
