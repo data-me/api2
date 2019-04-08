@@ -205,6 +205,28 @@ class change_info(APIView):
         except Exception as e:
             return JsonResponse({"message": "Sorryyyy! Something went wrong..." + str(e)})
 
+class change_com_info(APIView):
+    def post(self, request, format = None):
+        try:
+            user_logged = User.objects.all().get(pk = request.user.id)
+            if (not user_logged.groups.filter(name='Company').exists()):
+                return JsonResponse({"message":"You don't have permission to do this!"})
+            else:
+                data = request.POST
+                name = data['name']
+                description = data['description']
+                logo = data['logo']
+
+                if(request.POST.get('email') and (request.POST.get('email') != user_logged.email)):
+                    email = data['email']
+                    User.objects.all().filter(pk = user_logged.pk, id = user_logged.id ).update(email = email)
+
+                Company.objects.all().filter(user = user_logged).update(name = name, description = description, logo = logo)
+                return JsonResponse({"message": "Updated!"})
+        except Exception as jeje:
+                return JsonResponse({"message":str(jeje)})
+            
+
 class get_user_logged(APIView):
     def get(self, request, format=None):
         try:
