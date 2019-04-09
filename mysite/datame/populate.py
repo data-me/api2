@@ -62,7 +62,7 @@ def populate(request):
         apply5 = Apply.objects.create(title='Apply5',description='this is the apply 5',
                                       date=datetime.datetime(2019,4,1,12,0,0,0,pytz.UTC),status='AC',dataScientist = dataScientist1,offer = offer5)
         
-        submit1 = Submition.objects.create(dataScientist = dataScientist1, offer = offer2, file = 'http://www.aulakinesica.com.ar/clinicaquirurgica/files/Timed%20get%20up%20and%20go%20test.pdf',comments = 'Here is a test pdf to check the Submition with an accepted status',status = 'AC')
+        submit1 = Submition.objects.create(dataScientist = dataScientist1, offer = offer2, file = 'https://s1.q4cdn.com/806093406/files/doc_downloads/test.pdf',comments = 'Here is a test pdf to check the Submition with an accepted status',status = 'AC')
         submit2 = Submition.objects.create(dataScientist = dataScientist1, offer = offer5, file = 'https://oficinavirtual.ugr.es/apli/solicitudPAU/test.pdf',comments = 'Here is a test pdf to check the Submition with a SUBMITTED Status',status = 'SU')
         
         
