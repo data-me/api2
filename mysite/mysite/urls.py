@@ -64,5 +64,6 @@ urlpatterns = [
     path('api/v2/get_user_logged', get_user_logged.as_view()),
     path('api/v2/change_info', change_info.as_view()),
     path('api/v2/change_com_info', change_com_info.as_view()),
+    path('api/v2/change_offer/<offer_id>', change_Offer.as_view()),
 
 ]
