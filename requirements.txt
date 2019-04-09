@@ -9,7 +9,6 @@ statsmodels
 scipy
 paypalrestsdk
 python-dateutil
-
 #Heroku requirements
 django-heroku
 gunicorn
