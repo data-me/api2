@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, NOT
 import traceback
 import datetime
 from django.forms.models import model_to_dict
+
 #para dashboard de admin
 class User_view(APIView):
     def get(self, request, format=None):
@@ -51,7 +52,7 @@ class Company_view(APIView):
             try:
                     companyRecuperada = Company.objects.all().get(user = logged_user)
                     thiscompany = Company.objects.all().filter(user = logged_user).values()
-            except:
+            except Exception as e:
                     companyId = data['companyId']
                     print('companyId: ' + str(companyId))
                     #companyUserRecuperado = User.objects.all().get(pk = companyId)
@@ -61,7 +62,6 @@ class Company_view(APIView):
 
 
             return JsonResponse(list(thiscompany), safe=False)
-
 
 class Register_view(APIView):
     permission_classes = (~IsAuthenticated,)
@@ -192,40 +192,32 @@ class delete_user(APIView):
 class change_info(APIView):
     def post(self, request, format=None):
         try:
+            user_logged = User.objects.all().get(pk = request.user.id)
             data = request.POST
-            name = data['name']
-            surname = data['surname']
-            email = data ['email']
-            photo = data ['photo']
-            address = data ['address']
-            phone = data ['phone']
-            user_logged = User.objects.all().get(pk = request.user.id)
-            DataScientist.objects.all().filter(user = user_logged).update(name = name, surname = surname, email = email, photo = photo, address = address, phone = phone)
-            return JsonResponse({"message": "User updated"})
-        except Exception as e:
-            return JsonResponse({"message": "Sorryyyy! Something went wrong..." + str(e)})
-
-class change_com_info(APIView):
-    def post(self, request, format = None):
-        try:
-            user_logged = User.objects.all().get(pk = request.user.id)
-            if (not user_logged.groups.filter(name='Company').exists()):
-                return JsonResponse({"message":"You don't have permission to do this!"})
-            else:
-                data = request.POST
+            if (user_logged.groups.filter(name='DataScientist').exists()):
+                name = data['name']
+                surname = data['surname']
+                email = data ['email']
+                photo = data ['photo']
+                address = data ['address']
+                phone = data ['phone']
+                DataScientist.objects.all().filter(user = user_logged).update(name = name, surname = surname, email = email, photo = photo, address = address, phone = phone)
+                return JsonResponse({"message": "User updated"})
+            elif (user_logged.groups.filter(name='Company').exists()):
                 name = data['name']
                 description = data['description']
                 logo = data['logo']
 
-                if(request.POST.get('email') and (request.POST.get('email') != user_logged.email)):
-                    email = data['email']
-                    User.objects.all().filter(pk = user_logged.pk, id = user_logged.id ).update(email = email)
+                #if(request.POST.get('email') and (request.POST.get('email') != user_logged.email)):
+                #    email = data['email']
+                #    User.objects.all().filter(pk = user_logged.pk, id = user_logged.id ).update(email = email)
 
                 Company.objects.all().filter(user = user_logged).update(name = name, description = description, logo = logo)
                 return JsonResponse({"message": "Updated!"})
-        except Exception as jeje:
-                return JsonResponse({"message":str(jeje)})
-            
+            else:
+                return JsonResponse({"message":"Who are you?"})
+        except Exception as e:
+            return JsonResponse({"message": "Sorryyyy! Something went wrong..." + str(e)})            
 
 class get_user_logged(APIView):
     def get(self, request, format=None):
@@ -239,8 +231,6 @@ class get_user_logged(APIView):
             return JsonResponse(model_to_dict(res), safe = False)
         except Exception as e:
             return JsonResponse({"message": "Sorry! Something went wrong..." + str(e)})
-
-
 
 class whoami(APIView):
     def get(self, request, format=None):
