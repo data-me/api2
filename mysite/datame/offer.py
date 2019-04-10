@@ -84,19 +84,39 @@ class Offer_view(APIView):
             lookup_url_kwarg = "offer_id"
             offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
             if(thisCompany == offer.company):
-                try:
-                    applies = Apply.objects.all().values(offer = offer)
-                    if(applies != None):
-                        offer.delete()
-                        return JsonResponse({"message":"Successfully deleted offer"})
-                except:
+                applies = Apply.objects.all().values(offer = offer)
+                if(applies.first() == None):
+                    offer.delete()
+                    return JsonResponse({"message":"Successfully deleted offer"})
+                else:
                     return JsonResponse({"message":"This offer has at least one application"})
             else:
                 return JsonResponse({"message":"You do not own this offer"})
         except Exception as e:
             print(e)
-            return JsonResponse({"message":"Sorry! Something went wrong..."})
+            return JsonResponse({"message":"Sorry! Something went wrong..."+ str(e)})
     
+class change_Offer(APIView):
+    def post(self, request, offer_id, format=None):
+        try:
+            data = request.POST
+            title = data['title']
+            description = data['description']
+            thisCompany = Company.objects.all().get(user = request.user)
+            lookup_url_kwarg = "offer_id"
+            offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
+            if(thisCompany == offer.company):
+                applies = Apply.objects.all().filter(offer = offer)
+                print(applies)
+                if(applies.first() == None):
+                    Offer.objects.all().filter(pk = offer_id).update(title=title, description=description)
+                    return JsonResponse({"message": "Offer updated"})
+                else:
+                    return JsonResponse({"message":"This offer has at least one application, you cannot edit it"})                   
+            else:
+                return JsonResponse({"message":"You do not own this offer"})
+        except Exception as e:
+            return JsonResponse({"message": "Sorry! Something went wrong..." + str(e)})
 
 class Offer_admin_view(APIView):
     def get(self, request, format=None):

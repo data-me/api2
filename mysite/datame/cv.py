@@ -11,6 +11,25 @@ class CV_view(APIView):
             secs = []
             logged_user = User.objects.all().get(pk = request.user.id)
             try:
+                    #Ver CV de otro
+                    dataScientistId = data['dataScientistId']
+                    #thiscompany = Company.objects.all().filter(pk = companyId).values()
+                    #dataScientistUserRecuperado = User.objects.all().get(pk = dataScientistId)
+                    scientist = DataScientist.objects.all().get(pk = dataScientistId)
+                    curriculum = CV.objects.all().filter(owner = scientist).first()
+                    sections = Section.objects.all().filter(cv = curriculum)
+                    for sec in sections:
+                        items = []
+                        sec_items = Item.objects.all().filter(section = sec).values()
+                        items.extend(sec_items)
+                        secs.append({
+                            'Section':str(sec),
+                            'Section_Id':str(sec.id),
+                            'Items':items
+                        });
+
+
+            except:
                     #Ver mi CV
                     dataScientistRecuperado = DataScientist.objects.all().get(user = logged_user)
                     curriculum = CV.objects.all().filter(owner = dataScientistRecuperado).first()
@@ -25,22 +44,6 @@ class CV_view(APIView):
                             'Items':items
                         });
 
-            except:
-                    #Ver CV de otro
-                    dataScientistId = data['dataScientistId']
-                    dataScientistUserRecuperado = User.objects.all().get(pk = dataScientistId)
-                    scientist = DataScientist.objects.all().get(user = dataScientistUserRecuperado)
-                    curriculum = CV.objects.all().filter(owner = scientist).first()
-                    sections = Section.objects.all().filter(cv = curriculum)
-                    for sec in sections:
-                        items = []
-                        sec_items = Item.objects.all().filter(section = sec).values()
-                        items.extend(sec_items)
-                        secs.append({
-                            'Section':str(sec),
-                            'Section_Id':str(sec.id),
-                            'Items':items
-                        });
 
             return JsonResponse(list(secs), safe=False)
 
