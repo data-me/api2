@@ -84,7 +84,7 @@ class Offer_view(APIView):
             lookup_url_kwarg = "offer_id"
             offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
             if(thisCompany == offer.company):
-                applies = Apply.objects.all().values(offer = offer)
+                applies = Apply.objects.all().filter(offer = offer)
                 if(applies.first() == None):
                     offer.delete()
                     return JsonResponse({"message":"Successfully deleted offer"})
