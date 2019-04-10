@@ -65,4 +65,5 @@ urlpatterns = [
     path('api/v2/change_info', change_info.as_view()),
     path('api/v2/change_offer/<offer_id>', change_Offer.as_view()),
     path('api/v2/data/delete_item/<item_id>', Item_delete_view.as_view()),
+    path('api/v2/data/delete_section/<section_id>', Section_delete_view.as_view()),
 ]
