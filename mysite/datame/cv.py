@@ -11,6 +11,25 @@ class CV_view(APIView):
             secs = []
             logged_user = User.objects.all().get(pk = request.user.id)
             try:
+                    #Ver CV de otro
+                    dataScientistId = data['dataScientistId']
+                    #thiscompany = Company.objects.all().filter(pk = companyId).values()
+                    #dataScientistUserRecuperado = User.objects.all().get(pk = dataScientistId)
+                    scientist = DataScientist.objects.all().get(pk = dataScientistId)
+                    curriculum = CV.objects.all().filter(owner = scientist).first()
+                    sections = Section.objects.all().filter(cv = curriculum)
+                    for sec in sections:
+                        items = []
+                        sec_items = Item.objects.all().filter(section = sec).values()
+                        items.extend(sec_items)
+                        secs.append({
+                            'Section':str(sec),
+                            'Section_Id':str(sec.id),
+                            'Items':items
+                        });
+
+
+            except:
                     #Ver mi CV
                     dataScientistRecuperado = DataScientist.objects.all().get(user = logged_user)
                     curriculum = CV.objects.all().filter(owner = dataScientistRecuperado).first()
@@ -25,22 +44,6 @@ class CV_view(APIView):
                             'Items':items
                         });
 
-            except:
-                    #Ver CV de otro
-                    dataScientistId = data['dataScientistId']
-                    dataScientistUserRecuperado = User.objects.all().get(pk = dataScientistId)
-                    scientist = DataScientist.objects.all().get(user = dataScientistUserRecuperado)
-                    curriculum = CV.objects.all().filter(owner = scientist).first()
-                    sections = Section.objects.all().filter(cv = curriculum)
-                    for sec in sections:
-                        items = []
-                        sec_items = Item.objects.all().filter(section = sec).values()
-                        items.extend(sec_items)
-                        secs.append({
-                            'Section':str(sec),
-                            'Section_Id':str(sec.id),
-                            'Items':items
-                        });
 
             return JsonResponse(list(secs), safe=False)
 
@@ -96,6 +99,23 @@ class Section_name_view(APIView):
             secnames = Section_name.objects.all().values()
             return JsonResponse(list(secnames), safe=False)
 
+class Item_delete_view(APIView):
+    def delete(self, request, item_id, format=None):
+        try:
+            logged_user = request.user
+            datascientist = DataScientist.objects.all().get(user = logged_user)
+
+            lookup_url_kwarg = "item_id"
+            item = Item.objects.get(id = self.kwargs.get(lookup_url_kwarg))
+            if (datascientist == item.section.cv.owner):
+                item.delete()
+                return JsonResponse({"message":"Successfully deleted item"})
+            else:
+                return JsonResponse({"message":"You do not own this offer"})
+        except Exception as e:
+            return JsonResponse({"message":"Sorry! Something went wrong..."})
+
+
 
 class Item_view(APIView):
     def post(self, request, format=None):
@@ -106,9 +126,9 @@ class Item_view(APIView):
 
                 section = Section.objects.all().get(pk = secid)
 
-                logged_userid = request.user.datascientist.id
+                logged_user = request.user.datascientist
 
-                if logged_userid == section.cv.owner.id:
+                if logged_user == section.cv.owner:
 
                     date_start = data['datestart']
                     date_finish = request.POST.get('datefinish')
@@ -117,7 +137,7 @@ class Item_view(APIView):
                         if date_start < date_finish:
 
                             try:
-                                item_tosave = Item.objects.all().get(pk = data['itemid'])
+                                item_tosave = Item.objects.all().get(id = data['itemid'])
 
                                 item_tosave.name = data['name']
                                 item_tosave.description = data['description']
