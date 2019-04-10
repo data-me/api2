@@ -4,6 +4,18 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
+#para el dashboard
+class Submitions_view(APIView):
+    def get(self, request, format=None):
+        user_logged = User.objects.all().get(pk = request.user.id)
+        if (user_logged.is_superuser or user_logged.is_staff):
+            try:    
+                submitions = Submition.objects.all().values()
+                return JsonResponse(list(submitions), safe=False)
+            except:
+                print("there are no submitions")
+        return JsonResponse({"message":"Oops, something went wrong"})
+
 class Submition_view(APIView):
     permission_classes = (IsAuthenticated,)
     def post(self, request, format=None):
