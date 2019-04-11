@@ -27,7 +27,9 @@ class Offer_view(APIView):
                 try:
                     thisCompany = Company.objects.all().get(user = request.user)
                     # All offers instead only those who don't have an applicant
-                    ofertas = Offer.objects.all().filter(company = thisCompany).values()
+                    bills = OfferPaypalBill.objects.all().filter(pagado=False)
+                    bills_ids = [a.offer.id for a in bills]
+                    ofertas = Offer.objects.all().filter(company = thisCompany).exclude(id__in=bills_ids).values()
                 except:
                     date = datetime.datetime.utcnow()
                     thisDS = DataScientist.objects.all().get(user = request.user)
