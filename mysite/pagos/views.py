@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.core.mail import send_mail
 from django.http import HttpResponseBadRequest
 from rest_framework.views import APIView
+import traceback
 
 from django.http import JsonResponse
 
@@ -131,6 +132,7 @@ class AcceptPaypalView(APIView):
         print('PaymentID =>', payment_id)
         print('PayerID =>', payer_id)
         pago_paypal = paypalrestsdk.Payment.find(payment_id)
+        print('hi')
         print('Pago paypal=>', pago_paypal)
         if pago_paypal.execute({'payer_id': payer_id}):
             registro_pago.pagado = True
@@ -150,7 +152,9 @@ class AcceptPaypalView(APIView):
 
             res = {"message": "Offer created! "}
             return JsonResponse(res)
-        except:
+        except as Exception e:
+            print('This is error =>',e)
+            traceback.print_exc()
             res = {"message":"Oops, something went wrong"}
             return JsonResponse(res)
 
