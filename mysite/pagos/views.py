@@ -127,7 +127,11 @@ class AcceptPaypalView(APIView):
         """Aceptar el pago del cliente, actualiza el registro con los datos
         del cliente proporcionados por paypal"""
         registro_pago = get_object_or_404(OfferPaypalBill, payment_id=payment_id)
+        print('Hello logs')
+        print('PaymentID =>', payment_id)
+        print('PayerID =>', payer_id)
         pago_paypal = paypalrestsdk.Payment.find(payment_id)
+        print('Pago paypal=>', pago_paypal)
         if pago_paypal.execute({'payer_id': payer_id}):
             registro_pago.pagado = True
             registro_pago.payer_id = payer_id
@@ -141,6 +145,7 @@ class AcceptPaypalView(APIView):
     def get(self, request,paymentId,token_paypal,payerID,format=None):
 
         try:
+            print('I received params, paymentId:', paymentId, " and token:", token_paypal, "and payerID:", payerID)
             registro_pago = self._aceptar_pago_paypal(paymentId, payerID)
 
             res = {"message": "Offer created! "}
