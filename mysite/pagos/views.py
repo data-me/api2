@@ -152,7 +152,7 @@ class AcceptPaypalView(APIView):
 
             res = {"message": "Offer created! "}
             return JsonResponse(res)
-        except as Exception e:
+        except Exception as e:
             print('This is error =>',e)
             traceback.print_exc()
             res = {"message":"Oops, something went wrong"}
