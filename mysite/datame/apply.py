@@ -115,3 +115,18 @@ class AcceptApply_view(APIView):
             return res
         except:
                 return JsonResponse({"message":"Oops, something went wrong"})
+
+
+class Apply_v2_view(APIView):
+    def delete(self, request, application_id, format=None):
+        try:
+            application = Apply.objects.get(pk=application_id)
+            owner = DataScientist.objects.get(user=request.user)
+            if(application.dataScientist == owner and application.status == 'PE'):
+                application.delete()
+                res = JsonResponse({"code": "200", "message": "Application successfully deleted"})
+            else:
+                res = JsonResponse({"code": "401", "message": "The applications is not yours or is not pending"})
+            return res
+        except:
+            return JsonResponse({"message": "Oops, something went wrong"})
