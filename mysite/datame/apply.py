@@ -35,6 +35,21 @@ class ApplicationsAccepted_view(APIView):
         except:
             return JsonResponse({"message":"Oops, something went wrong"})
 
+class ApplicationsOfOffer(APIView):
+    def get(self, request, offer_id, format=None):
+        try:
+            lookup_url_kwarg = "offer_id"
+            offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
+
+            applicationsOfOffer = Apply.objects.all().filter(offer = offer).values()
+
+            return JsonResponse(list(applicationsOfOffer), safe=False)
+
+        except:
+            return JsonResponse({"There are no applications for the offer"})
+
+
+
 class Apply_view(APIView):
     def post(self, request, format=None):
         try:
@@ -115,3 +130,18 @@ class AcceptApply_view(APIView):
             return res
         except:
                 return JsonResponse({"message":"Oops, something went wrong"})
+
+
+class Apply_v2_view(APIView):
+    def delete(self, request, application_id, format=None):
+        try:
+            application = Apply.objects.get(pk=application_id)
+            owner = DataScientist.objects.get(user=request.user)
+            if(application.dataScientist == owner and application.status == 'PE'):
+                application.delete()
+                res = JsonResponse({"code": "200", "message": "Application successfully deleted"})
+            else:
+                res = JsonResponse({"code": "401", "message": "The applications is not yours or is not pending"})
+            return res
+        except:
+            return JsonResponse({"message": "Oops, something went wrong"})

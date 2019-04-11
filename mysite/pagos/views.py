@@ -11,9 +11,12 @@ from rest_framework.views import APIView
 from django.http import JsonResponse
 
 from .models import OfferPaypalBill
-from datame.models import Offer
+from .models import UserPlanPaypalBill
+from datame.models import *
 
 import paypalrestsdk
+from paypalrestsdk import Payment
+import traceback
 
 
 # Create your views here.
@@ -149,3 +152,136 @@ class AcceptPaypalView(APIView):
             res = {"message":"Oops, something went wrong"}
             return JsonResponse(res)
 
+
+class PaypalUserPlanPaymentView(APIView):
+    def get(self, request, format=None):
+        if request.method == "GET":
+            try:
+                response = {}
+                try:
+                    dataScientist_user = User.objects.all().get(pk = request.user.id)
+                    dataScientist = DataScientist.objects.all().get(user=dataScientist_user)
+                except:
+                    response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: Logged data scientist could not be retrieved.'
+                    response['UserCodeErrorMessage'] = 'None.'
+                    return JsonResponse(response, safe=False)
+
+                try:
+                    userPlan_pk = request.GET['userplan_pk']
+                except:
+                    response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: No userPlan_pk was received.'
+                    response['UserCodeErrorMessage'] = 'None.'
+                    return JsonResponse(response, safe=False)
+
+                try:
+                    userplan = UserPlan.objects.get(pk=userPlan_pk)
+                    assert userplan.dataScientist == dataScientist
+                    userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate')
+                    assert 0 < userPlanHistory.count()
+                    userplanPaymentPending = userPlanHistory.first()
+
+                    assert userplan == userplanPaymentPending
+                except:
+                    response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: An error ocurred retrieving the user plan to pay.'
+                    response['UserCodeErrorMessage'] = 'None.'
+                    return JsonResponse(response, safe=False)
+
+                numberOfMonths = (userplan.expirationDate.year - userplan.startDate.year) \
+                                 + (userplan.expirationDate.month - userplan.startDate.month)
+
+                amountToChargeNMonths = ((userplan.expirationDate.year - userplan.startDate.year) * 12
+                                     + (userplan.expirationDate.month - userplan.startDate.month)) * 5.0
+
+                print('Pagos.views.PaypalUserPlanPaymentView: Months that are being payed:' + str(amountToChargeNMonths))
+
+                #Configuring PayPal payment
+                paypalrestsdk.configure({
+                    "mode": settings.PAYPAL_MODE,
+                    "client_id": settings.PAYPAL_CLIENT_ID,
+                    "client_secret": settings.PAYPAL_CLIENT_SECRET, })
+
+
+                # Payment object from paypalrestsdk
+                payment = paypalrestsdk.Payment({
+                    "intent": "sale",
+
+                    #Paymeny method
+                    "payer":{
+                        "payment_method": "paypal"
+                    },
+
+                    #Set redirect URLs
+                    "redirect_urls": {
+                        "return_url": settings.SITE_URL + "accept_userplan_payment",
+                        "cancel_url": settings.SITE_URL + "cancel_userplan_payment",
+                    },
+
+                    # Set transaction object
+                    "transactions": [{
+                        "description": "Purchasing PRO plan.",
+                        "amount": {
+                            "total": amountToChargeNMonths,
+                            "currency": "EUR",
+                        },
+                    # ItemList
+                        "item_list": {
+                            "items": [
+                                {
+                                    "name": str(numberOfMonths) + " months of PRO user plan.",
+                                    "sku": str(userplan.id),
+                                    "price": 5.0,
+                                    "currency": "EUR",
+                                    "quantity": numberOfMonths,
+                                }
+                            ]},
+                    }]
+                })
+
+                # Create payment
+                if payment.create():
+                    # Extract redirect url
+                    for link in payment.links:
+                        if link.method == "REDIRECT":
+                            # Capture redirect url
+                            redirect_url = link.href
+
+                            # Redirect the customer to redirect_url
+                else:
+                    print("Error while creating payment:")
+                    print(payment.error)
+
+                self.request.session['payment_id'] = payment.id
+
+                UserPlanPaypalBill.objects.create_userplan_payment(payment.id, userplan)
+
+                response['redirect_url'] = redirect_url
+                response['UserCodeMessage'] = 'Please, proceed with the payment.'
+                return JsonResponse(response, safe=False)
+
+            except:
+                traceback.print_exc()
+                response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: Oops, something went wrong.'
+                response['UserCodeErrorMessage'] = 'None.'
+                return JsonResponse(response, safe=False)
+
+class AcceptPaypalUserPlanPayment(APIView):
+    def get(self, request, format=None):
+        response = {}
+
+        # Payment ID obtained when creating the payment (following redirect)
+        try:
+            payment_id = request.GET.get('paymentId')
+            payer_id = request.GET.get('PayerID')
+        except:
+            raise HttpResponseBadRequest
+
+        # Execute payment with the payer ID from the create payment call (following redirect)
+        payment = Payment.find(str(payment_id))
+
+        if payment.execute({"payer_id": str(payer_id)}):
+            print("Payment[%s] execute successfully" % (payment.id))
+        else:
+            print(payment.error)
+
+
+#TODO class CancelPaypalUserPlanPayment(APIView):

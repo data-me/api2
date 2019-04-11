@@ -13,7 +13,11 @@ class Offer_view(APIView):
             data = request.GET
             if data.get('search') != None:
                 date = datetime.datetime.utcnow()
-                ofertas = Offer.objects.filter(Q(title__contains = data['search']) | Q(description__contains = data['search']), limit_time__gte = date, finished=False).values()
+                thisDS = DataScientist.objects.all().get(user = request.user)
+                applies = Apply.objects.all().filter(dataScientist = thisDS)
+                user_applied_offers = [a.offer.id for a in applies]
+                
+                ofertas = Offer.objects.filter(Q(title__contains = data['search']) | Q(description__contains = data['search']), limit_time__gte = date, finished=False).exclude(id__in=user_applied_offers).values()
                 return JsonResponse(list(ofertas), safe=False)
             elif data.get('offerId') != None:
                 ofertas = Offer.objects.filter(id = data['offerId']).values()

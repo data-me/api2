@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/v1/section_name', Create_section_name.as_view()),
     path('api/v1/item', Item_view.as_view()),
     path('api/v1/company', Company_view.as_view()),
+    path('api/v1/dataScientist', DataScientist_view.as_view()),
     path('api/v1/populate', populate),
     path('api/v1/whoami', whoami.as_view()),
     path('api/v1/register', Register_view.as_view()),
@@ -65,5 +66,7 @@ urlpatterns = [
     path('api/v2/change_info', change_info.as_view()),
     path('api/v2/change_offer/<offer_id>', change_Offer.as_view()),
     path('api/v2/data/delete_item/<item_id>', Item_delete_view.as_view()),
+    path('api/v2/applicationsOfOffer/<offer_id>', ApplicationsOfOffer.as_view()),
+    path('api/v2/application/<application_id>', Apply_v2_view.as_view()),
     path('api/v2/data/delete_section/<section_id>', Section_delete_view.as_view()),
 ]
