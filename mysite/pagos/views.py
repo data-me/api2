@@ -39,7 +39,7 @@ class PaypalView(APIView):
             "payer": {"payment_method": "paypal"},
             "redirect_urls": {
                 # "return_url": settings.SITE_URL + reverse('aceptar-pago-paypal'),
-                "return_url": settings.SITE_URL + "offer_paypal_accepted",
+                "return_url": settings.SITE_URL + "offer_paypal_accepted.html",
                 "cancel_url": settings.SITE_URL},
 
             # Transaction -
