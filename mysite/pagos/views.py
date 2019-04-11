@@ -127,6 +127,8 @@ class AcceptPaypalView(APIView):
     def _aceptar_pago_paypal(self, payment_id, payer_id):
         """Aceptar el pago del cliente, actualiza el registro con los datos
         del cliente proporcionados por paypal"""
+        paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,"client_id": settings.PAYPAL_CLIENT_ID,"client_secret": settings.PAYPAL_CLIENT_SECRET, })
+
         registro_pago = get_object_or_404(OfferPaypalBill, payment_id=payment_id)
         print('Hello logs')
         print('PaymentID =>', payment_id)
