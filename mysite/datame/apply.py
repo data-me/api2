@@ -35,6 +35,21 @@ class ApplicationsAccepted_view(APIView):
         except:
             return JsonResponse({"message":"Oops, something went wrong"})
 
+class ApplicationsOfOffer(APIView):
+    def get(self, request, offer_id, format=None):
+        try:
+            lookup_url_kwarg = "offer_id"
+            offer = Offer.objects.get(id = self.kwargs.get(lookup_url_kwarg))
+
+            applicationsOfOffer = Apply.objects.all().filter(offer = offer).values()
+
+            return JsonResponse(list(applicationsOfOffer), safe=False)
+
+        except:
+            return JsonResponse({"There are no applications for the offer"})
+
+
+
 class Apply_view(APIView):
     def post(self, request, format=None):
         try:
