@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from django.http import HttpResponseNotFound
 
-
+from pagos.models import OfferPaypalBill
 
 class Offer_view(APIView):
     def get(self, request, format=None):
@@ -34,7 +34,9 @@ class Offer_view(APIView):
                     applies = Apply.objects.all().filter(dataScientist = thisDS)
                     user_applied_offers = [a.offer.id for a in applies]
                     # All offers whos time has not come yet
-                    ofertas = Offer.objects.all().filter(limit_time__gte = date, finished=False).exclude(id__in=user_applied_offers).values()
+                    bills = OfferPaypalBill.objects.all().filter(pagado=False)
+                    bills_ids = [a.offer.id for a in bills]
+                    ofertas = Offer.objects.all().filter(limit_time__gte = date, finished=False).exclude(id__in=user_applied_offers).exclude(id__in=bills_ids).values()
                 return JsonResponse(list(ofertas), safe=False)
         except Exception as e:
             print(e)
