@@ -180,7 +180,7 @@ PAYPAL_MODE= "sandbox"
 PAYPAL_CLIENT_ID = "AQnKuEyaCgxZsEBPC-aq3glrpVK1dcTUUbvjkmnguZOM1WLQnsEU-y7i2oh3VkM_Xm4AfbJQx8AKdiYF"
 PAYPAL_CLIENT_SECRET = "EEkGJcVWziLr8FnQFC-BCYX0bcSz_xyh3POT7iR1K9e7fxFLVhI9EJSnOl5Jn3d_UhqydqGEYTfzCozc"
 
-SITE_URL = 'https://api2-datame.herokuapp.com/'
+SITE_URL ='https://front2-datame.herokuapp.com/'
 
 import django_heroku
 django_heroku.settings(locals())
