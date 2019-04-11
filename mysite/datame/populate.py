@@ -79,17 +79,17 @@ def populate(request):
         section4 = Section.objects.create(name = sectionName2,cv = cv1 )
 
         item1 = Item.objects.create(name='Studient in the US', section=section1, description='I studied in the ETSII, US for 4 years. It was a hard work',
-                                    entity = 'ETSII - US',date_start=datetime.datetime(2014,3,28,23,13,0,0,pytz.UTC), date_finish= datetime.datetime(2019,6,28,23,13,0,0,pytz.UTC))
+                                    entity = 'ETSII - US',date_start=datetime.datetime(2014,3,28), date_finish= datetime.datetime(2019,6,28))
 
         item2 = Item.objects.create(name='About me', section=section2, description="I'm a good partner. I can work with others DataScientist if you need. I work very fast and i can finish any work",
-                                    entity ='Me',date_start=datetime.datetime(1997,1,18,23,13,0,0,pytz.UTC), date_finish= datetime.datetime(2019,6,28,23,13,0,0,pytz.UTC))
+                                    entity ='Me',date_start=datetime.datetime(1997,1,18), date_finish= datetime.datetime(2019,6,28))
 
         item3 = Item.objects.create(name='Working in Everis', section=section4, description="I am working in Everis procesing data from users.",
-                                    entity ='',date_start=datetime.datetime(2015,11,29,21,13,0,0,pytz.UTC),
+                                    entity ='',date_start=datetime.datetime(2015,11,29),
                                      date_finish= None)
 
         item4 = Item.objects.create(name='Engineer in Endesa', section=section3, description="I've work in Endesa since 2013. I was in charge the data from the bills.",
-                                    entity = 'Ensesa',date_start=datetime.datetime(2013,3,11,23,13,0,0,pytz.UTC), date_finish= datetime.datetime(2017,1,2,23,13,0,0,pytz.UTC))
+                                    entity = 'Ensesa',date_start=datetime.datetime(2013,3,11), date_finish= datetime.datetime(2017,1,2))
 
         message1 = Message.objects.create(receiver = data1, sender = admin, title = "Welcome!", body= "Welcome to DataMe!", isAlert=False)
         message2 = Message.objects.create(receiver = data2, sender = admin, title = "Welcome!", body= "Welcome to DataMe!", isAlert=False)
