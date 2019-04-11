@@ -103,9 +103,13 @@ class payUserPlan(APIView):
             expirationDate = startDate+relativedelta(months=+nMonths)
         else:
             return JsonResponse({"message": "There was an unexpected case when determining the period for the user plan."})
+
         try:
             new_userPlanPayment =  UserPlan.objects.create(dataScientist=dataScientist, type='PRO', startDate=startDate, expirationDate=expirationDate);
-            return JsonResponse({"message": "Successfully created or extended your user plan"})
+            response = {}
+            response['message'] = "Successfully created or extended your user plan"
+            response['userplan_pk'] = new_userPlanPayment.id
+            return JsonResponse(response, safe=False)
         except:
             traceback.print_exc()
             return JsonResponse({"message": "Oops, something went wrong"})

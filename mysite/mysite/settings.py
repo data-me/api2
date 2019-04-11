@@ -55,8 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'authentication',
     'corsheaders',
-    'pagos'
-
+    'pagos',
 ]
 
 MIDDLEWARE = [
