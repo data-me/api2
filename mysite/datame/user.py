@@ -48,20 +48,32 @@ class Company_view(APIView):
             data = request.GET
             logged_user = User.objects.all().get(pk = request.user.id)
             print('logged_user: ' + str(logged_user))
-            #company = []
             try:
+                    companyId = data['companyId']
+                    thiscompany = Company.objects.all().filter(pk = companyId).values()
+
+            except Exception as e:
                     companyRecuperada = Company.objects.all().get(user = logged_user)
                     thiscompany = Company.objects.all().filter(user = logged_user).values()
-            except Exception as e:
-                    companyId = data['companyId']
-                    print('companyId: ' + str(companyId))
-                    #companyUserRecuperado = User.objects.all().get(pk = companyId)
-                    #print('company user recuperada: ' + str(companyUserRecuperado))
-                    thiscompany = Company.objects.all().filter(pk = companyId).values()
-                    print('company recuperada: ' + str(thiscompany))
 
 
             return JsonResponse(list(thiscompany), safe=False)
+
+class DataScientist_view(APIView):
+    def get(self, request, format=None):
+        if request.method == "GET":
+            data = request.GET
+            logged_user = User.objects.all().get(pk = request.user.id)
+            print('logged_user: ' + str(logged_user))
+            try:
+                    dataScientistId = data['dataScientistId']
+                    thisds = DataScientist.objects.all().get(pk = dataScientistId)
+
+            except Exception as e:
+                    thisds = DataScientist.objects.all().get(user = user_logged)
+
+
+            return JsonResponse(model_to_dict(thisds), safe=False)
 
 class Register_view(APIView):
     permission_classes = (~IsAuthenticated,)
@@ -217,7 +229,7 @@ class change_info(APIView):
             else:
                 return JsonResponse({"message":"Who are you?"})
         except Exception as e:
-            return JsonResponse({"message": "Sorryyyy! Something went wrong..." + str(e)})            
+            return JsonResponse({"message": "Sorryyyy! Something went wrong..." + str(e)})
 
 class get_user_logged(APIView):
     def get(self, request, format=None):
