@@ -23,7 +23,7 @@ class PagoPaypalManager(models.Manager):
 
 
 class OfferPaypalBill(models.Model):
-    offer = models.OneToOneField(Offer,on_delete=models.SET(0))
+    offer = models.OneToOneField(Offer,on_delete=models.CASCADE)
     # Identificador de paypal para este pago
     payment_id = models.CharField(max_length=64, db_index=True)
     # Id unico asignado por paypal a cada usuario no cambia aunque

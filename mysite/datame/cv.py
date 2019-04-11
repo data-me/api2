@@ -126,9 +126,9 @@ class Item_view(APIView):
 
                 section = Section.objects.all().get(pk = secid)
 
-                logged_userid = request.user.datascientist.id
+                logged_user = request.user.datascientist
 
-                if logged_userid == section.cv.owner.id:
+                if logged_user == section.cv.owner:
 
                     date_start = data['datestart']
                     date_finish = request.POST.get('datefinish')
@@ -137,7 +137,7 @@ class Item_view(APIView):
                         if date_start < date_finish:
 
                             try:
-                                item_tosave = Item.objects.all().get(pk = data['itemid'])
+                                item_tosave = Item.objects.all().get(id = data['itemid'])
 
                                 item_tosave.name = data['name']
                                 item_tosave.description = data['description']
