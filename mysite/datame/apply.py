@@ -8,7 +8,7 @@ from django.forms.models import model_to_dict
 class Applications_view(APIView):
     def get(self, request, format=None):
         try:
-            
+
             user_logged = User.objects.all().get(pk = request.user.id)
             applications = []
             if (user_logged.is_superuser or user_logged.is_staff):
@@ -23,7 +23,7 @@ class Applications_view(APIView):
 class ApplicationsAccepted_view(APIView):
     def get(self, request, format=None):
         try:
-            
+
             user_logged = User.objects.all().get(pk = request.user.id)
             applicationsAccepted = []
             if (user_logged.is_superuser or user_logged.is_staff):
@@ -97,7 +97,7 @@ class Apply_view(APIView):
                     data = request.GET
                     #TODO Cuando se realice el login lo ideal es que no se le tenga que pasar la ID del principal, sino recuperarla mediante autentificacion
 
-                    applys = Apply.objects.all().filter(dataScientist = dataScientistRecuperado).values()
+                    applys = Apply.objects.all().filter(dataScientist = dataScientistRecuperado).values('title','description','date','status','dataScientist_id','offer_id','offer__files','id')
                     return JsonResponse(list(applys), safe=False)
         except:
             return JsonResponse({"message":"Oops, something went wrong"})

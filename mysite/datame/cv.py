@@ -115,7 +115,21 @@ class Item_delete_view(APIView):
         except Exception as e:
             return JsonResponse({"message":"Sorry! Something went wrong..."})
 
+class Section_delete_view(APIView):
+    def delete(self, request, section_id, format=None):
+        try:
+            logged_user = request.user
+            datascientist = DataScientist.objects.all().get(user = logged_user)
 
+            lookup_url_kwarg = "section_id"
+            section = Section.objects.get(id = self.kwargs.get(lookup_url_kwarg))
+            if (datascientist == section.cv.owner):
+                section.delete()
+                return JsonResponse({"message":"Successfully deleted section"})
+            else:
+                return JsonResponse({"message":"You do not own this offer"})
+        except Exception as e:
+            return JsonResponse({"message":"Sorry! Something went wrong..."})
 
 class Item_view(APIView):
     def post(self, request, format=None):

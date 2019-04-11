@@ -40,15 +40,15 @@ def populate(request):
         company02 = Company.objects.create(user = company2, name = 'Company 2', description = 'Description 2',nif = 'nif2', logo = 'www.company2.com')
 
         offer1 = Offer.objects.create(title='Offer1',description='this is the offer 1',price_offered =1000,
-                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,7,12,21,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/file.csv',company= company01)
+                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,7,12,21,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/offerfile1.csv',company= company01)
         offer2 = Offer.objects.create(title='Offer2',description='this is the offer 2',price_offered =1350,
-                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,4,1,10,0,0,0,pytz.UTC), finished = True, files = 'https://github.com/data-me/api2/blob/Sprint2/file.csv',company= company01)
+                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,4,1,10,0,0,0,pytz.UTC), finished = True, files = 'https://github.com/data-me/api2/blob/Sprint2/offerfile2.csv',company= company01)
         offer3 = Offer.objects.create(title='Offer3',description='this is the offer 3',price_offered =3100,
-                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,9,12,10,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/file.csv',company= company01)
+                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,9,12,10,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/offerfile3.csv',company= company01)
         offer4 = Offer.objects.create(title='Offer4',description='this is the offer 4',price_offered =200,
-                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,9,12,10,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/file.csv',company= company02)
+                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2019,9,12,10,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/offerfile4.csv',company= company02)
         offer5 = Offer.objects.create(title='Offer5',description='this is the offer 5',price_offered =450,
-                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2020,3,2,10,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/file.csv',company= company02)
+                                      creation_date=datetime.datetime.utcnow(),limit_time = datetime.datetime(2020,3,2,10,0,0,0,pytz.UTC), finished = False, files = 'https://github.com/data-me/api2/blob/Sprint2/offerfile5.csv',company= company02)
 
         apply1 = Apply.objects.create(title='Apply1',description='this is the apply 1',
                                       date=datetime.datetime(2019,3,27,16,30,0,0,pytz.UTC),status='RE',dataScientist = dataScientist2, offer = offer2)
@@ -62,8 +62,8 @@ def populate(request):
         apply5 = Apply.objects.create(title='Apply5',description='this is the apply 5',
                                       date=datetime.datetime(2019,4,1,12,0,0,0,pytz.UTC),status='AC',dataScientist = dataScientist1,offer = offer5)
 
-        submit1 = Submition.objects.create(dataScientist = dataScientist1, offer = offer2, file = 'https://s1.q4cdn.com/806093406/files/doc_downloads/test.pdf',comments = 'Here is a test pdf to check the Submition with an accepted status',status = 'AC')
-        submit2 = Submition.objects.create(dataScientist = dataScientist1, offer = offer5, file = 'https://oficinavirtual.ugr.es/apli/solicitudPAU/test.pdf',comments = 'Here is a test pdf to check the Submition with a SUBMITTED Status',status = 'SU')
+        submit1 = Submition.objects.create(dataScientist = dataScientist1, offer = offer2, file = 'https://github.com/data-me/api2/blob/Sprint2/submissionfile1.csv',comments = 'Here is a test pdf to check the Submition with an accepted status',status = 'AC')
+        submit2 = Submition.objects.create(dataScientist = dataScientist1, offer = offer5, file = 'https://github.com/data-me/api2/blob/Sprint2/submissionfile2.csv',comments = 'Here is a test pdf to check the Submition with a SUBMITTED Status',status = 'SU')
 
 
         cv1 = CV.objects.create(owner = dataScientist1)
