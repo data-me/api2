@@ -51,6 +51,7 @@ class UserPlan(models.Model):
     type = models.CharField('Type', max_length = 4, choices = TYPE_CHOICES)
     startDate = models.DateTimeField(null = True)
     expirationDate = models.DateTimeField(null = True)
+    isPayed = models.BooleanField(default= False)
 
     def __str__(self):
         res = 'User Plan from ' + self.dataScientist.name

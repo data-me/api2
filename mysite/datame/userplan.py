@@ -26,7 +26,8 @@ class userPlanHistory(APIView):
                     # List userplan as administrator
                     assert logged_user.is_staff
                     dataScientist = DataScientist.objects.all().get(pk=request.GET.get('dataScientistId'))
-                    userPlanHistory = list(UserPlan.objects.filter(dataScientist=dataScientist).values())
+                    userPlanHistory = list(UserPlan.objects.filter(dataScientist=dataScientist)
+                                           .filter(isPayed=True).values())
                     response.update({
                         'userId': str(logged_user.id),
                         'dataScientistId': str(dataScientist.id),
@@ -55,7 +56,8 @@ class currentUserPlan(APIView):
             except:
                 return JsonResponse({"message": "Sorry, there was a problem retrieving the Data Scientist"})
             try:
-                userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate')
+                userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist)\
+                    .filter(isPayed=True).order_by('-expirationDate')
                 response['dataScientistId'] = dataScientist.id
                 currentUserPlan = None
                 if 0 < userPlanHistory.count():
@@ -83,7 +85,7 @@ class payUserPlan(APIView):
             dataScientist = DataScientist.objects.all().get(user=logged_user)
         except:
             return JsonResponse({"message": "Only data scientists can update their user plan."})
-        userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate')
+        userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).filter(isPayed=True).order_by('-expirationDate')
         currentUserPlan = None
         if 0 < userPlanHistory.count():
             currentUserPlan = userPlanHistory.first()
