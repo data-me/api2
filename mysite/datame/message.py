@@ -32,11 +32,10 @@ class Message_view(APIView):
 
             new_message = Message.objects.create(title=title, body=body, moment=moment, receiver=receiver, sender=senderId, isAlert= isAlert)
 
-            print('Sucessfully created new message')
             return JsonResponse({"message":"Successfully created new message"})
         except Exception as e:
             print(e)
-            return JsonResponse({"message":"Oops, something went wrong"})
+            return JsonResponse({"message":"El usuario no existe / User doesn't exists"})
     def get(self, request, format=None):
         try:
             data = request.GET
@@ -51,3 +50,4 @@ class Message_view(APIView):
             return JsonResponse(list(messages), safe=False)
         except:
             return JsonResponse({"message":"Oops, something went wrong"})
+        

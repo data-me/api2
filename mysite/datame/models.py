@@ -138,8 +138,8 @@ class Item(models.Model):
     section = models.ForeignKey("datame.Section", on_delete = models.CASCADE, related_name = 'items')
     description = models.CharField("Description", max_length=500)
     entity = models.CharField("Entity", max_length=50, blank=True,null=True)
-    date_start = models.DateTimeField("Start date")
-    date_finish = models.DateTimeField("End date", blank=True, null=True)
+    date_start = models.DateField("Start date")
+    date_finish = models.DateField("End date", blank=True, null=True)
 
     def __str__(self):
         return self.name
