@@ -34,7 +34,7 @@ def populate(request):
         photo='https://media.istockphoto.com/photos/portrait-of-a-german-businessman-with-beard-picture-id480286744',
         address='C/Cristo del Amor Number 21',phone='955766587')
 
-        userPlan1 = UserPlan.objects.create(type='PRO',dataScientist=dataScientist1,startDate=datetime.datetime(2019,1,1,0,0,0,0,pytz.UTC),expirationDate=datetime.datetime(2020,1,1,0,0,0,0,pytz.UTC))
+        userPlan1 = UserPlan.objects.create(type='PRO',dataScientist=dataScientist1,startDate=datetime.datetime(2019,1,1,0,0,0,0,pytz.UTC),expirationDate=datetime.datetime(2020,1,1,0,0,0,0,pytz.UTC),isPayed=True)
 
         company01 = Company.objects.create(user = company1, name = 'Endesa', description = 'Endesa, fundada como «Empresa Nacional de Electricidad Sociedad Anónima» y cuyo nombre legal es Endesa, S.A., es una empresa española que opera en los sectores eléctrico y gasístico.',nif = '44060644A', logo = 'https://graffica.info/wp-content/uploads/2016/01/Captura-de-pantalla-2016-01-28-a-las-19.00.55.png')
         company02 = Company.objects.create(user = company2, name = 'Everis', description = 'Somos everis an NTT DATA Company, nos dedicamos a la consultoría y outsourcing abarcando todos los sectores del ámbito económico, llegando a facturar en el último ejercicio fiscal cerca de 1.173 millones de euros.',nif = '45070745B', logo = 'https://worldfootballsummit.com/wp-content/uploads/2018/08/logo-vector-everis.jpg')

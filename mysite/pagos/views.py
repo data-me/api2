@@ -76,7 +76,7 @@ class PaypalView(APIView):
                 if link.method == "REDIRECT":
                     url_pago = link.href
         else:
-            raise Exception(pago.error)
+            raise Exception(pago_paypal.error)
 
         return url_pago, pago_paypal
 
@@ -156,6 +156,7 @@ class AcceptPaypalView(APIView):
 
 class PaypalUserPlanPaymentView(APIView):
     def get(self, request, format=None):
+        print("is the paypal_userPlan_payment_getting_to_back?==========")
         if request.method == "GET":
             try:
                 response = {}
@@ -163,6 +164,7 @@ class PaypalUserPlanPaymentView(APIView):
                     dataScientist_user = User.objects.all().get(pk = request.user.id)
                     dataScientist = DataScientist.objects.all().get(user=dataScientist_user)
                 except:
+                    traceback.print_exc()
                     response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: Logged data scientist could not be retrieved.'
                     response['UserCodeErrorMessage'] = 'None.'
                     return JsonResponse(response, safe=False)
@@ -170,6 +172,7 @@ class PaypalUserPlanPaymentView(APIView):
                 try:
                     userPlan_pk = request.GET['userplan_pk']
                 except:
+                    traceback.print_exc()
                     response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: No userPlan_pk was received.'
                     response['UserCodeErrorMessage'] = 'None.'
                     return JsonResponse(response, safe=False)
@@ -177,12 +180,13 @@ class PaypalUserPlanPaymentView(APIView):
                 try:
                     userplan = UserPlan.objects.get(pk=userPlan_pk)
                     assert userplan.dataScientist == dataScientist
-                    userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate')
+                    userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate').order_by('-pk')
                     assert 0 < userPlanHistory.count()
                     userplanPaymentPending = userPlanHistory.first()
 
                     assert userplan == userplanPaymentPending
                 except:
+                    traceback.print_exc()
                     response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: An error ocurred retrieving the user plan to pay.'
                     response['UserCodeErrorMessage'] = 'None.'
                     return JsonResponse(response, safe=False)
@@ -274,6 +278,7 @@ class AcceptPaypalUserPlanPayment(APIView):
             payment_id = request.GET.get('paymentId')
             payer_id = request.GET.get('PayerID')
         except:
+            traceback.print_exc()
             raise HttpResponseBadRequest
 
         # Execute payment with the payer ID from the create payment call (following redirect)
@@ -281,8 +286,26 @@ class AcceptPaypalUserPlanPayment(APIView):
 
         if payment.execute({"payer_id": str(payer_id)}):
             print("Payment[%s] execute successfully" % (payment.id))
+            try:
+                userPlan_pk = payment.transactions[0]['item_list']['items'][0]['sku']
+                print("The id of the user_plan is " +  str(userPlan_pk))
+                userPlan = UserPlan.objects.get(pk=userPlan_pk)
+                userPlan.isPayed = True
+                print("The said userplan" + str(userPlan.id))
+                userPlan.save()
+                print("The said userplan" + str(userPlan.isPayed))
+            except:
+                traceback.print_exc()
+                response[
+                    'DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: No userPlan_pk was received.'
+                response['UserCodeErrorMessage'] = 'None.'
+                return JsonResponse(response, safe=False)
+            response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: Everything went perfect with payment!.'
+            response['MessageCode'] = 'You have paid successfuly'
         else:
             print(payment.error)
+            response['DeveloperErrorMessage'] = 'ERRROOOOR!'
+            response['MessageCode'] = 'ERRROOOOR!'
 
 
-#TODO class CancelPaypalUserPlanPayment(APIView):
+        return JsonResponse(response, safe=False)
