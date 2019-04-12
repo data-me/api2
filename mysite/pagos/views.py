@@ -213,8 +213,8 @@ class PaypalUserPlanPaymentView(APIView):
 
                     #Set redirect URLs
                     "redirect_urls": {
-                        "return_url": settings.SITE_URL + "accept_userplan_payment",
-                        "cancel_url": settings.SITE_URL + "cancel_userplan_payment",
+                        "return_url": settings.SITE_URL + "accept_userplan_payment.html",
+                        "cancel_url": settings.SITE_URL + "cancel_userplan_payment.html",
                     },
 
                     # Set transaction object
