@@ -33,7 +33,7 @@ class DataScientist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField('Name', max_length = 30)
     surname = models.CharField('Surname', max_length = 50)
-    email = models.CharField('Email', max_length = 50)
+    email = models.EmailField('Email')
     photo = models.CharField('Photo', max_length = 100)
     address = models.CharField('Address', max_length = 100)
     phone = models.CharField('Phone', max_length = 9)
