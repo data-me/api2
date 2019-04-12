@@ -42,7 +42,7 @@ class PaypalView(APIView):
             "payer": {"payment_method": "paypal"},
             "redirect_urls": {
                 # "return_url": settings.SITE_URL + reverse('aceptar-pago-paypal'),
-                "return_url": settings.SITE_URL + "offer_paypal_accepted",
+                "return_url": settings.SITE_URL + "offer_paypal_accepted.html",
                 "cancel_url": settings.SITE_URL},
 
             # Transaction -
@@ -129,6 +129,7 @@ class AcceptPaypalView(APIView):
     def _aceptar_pago_paypal(self, payment_id, payer_id):
         """Aceptar el pago del cliente, actualiza el registro con los datos
         del cliente proporcionados por paypal"""
+        paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,"client_id": settings.PAYPAL_CLIENT_ID,"client_secret": settings.PAYPAL_CLIENT_SECRET, })
         registro_pago = get_object_or_404(OfferPaypalBill, payment_id=payment_id)
         pago_paypal = paypalrestsdk.Payment.find(payment_id)
         if pago_paypal.execute({'payer_id': payer_id}):
