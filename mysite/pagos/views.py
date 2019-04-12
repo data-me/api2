@@ -42,7 +42,7 @@ class PaypalView(APIView):
             "payer": {"payment_method": "paypal"},
             "redirect_urls": {
                 # "return_url": settings.SITE_URL + reverse('aceptar-pago-paypal'),
-                "return_url": settings.SITE_URL + "offer_paypal_accepted",
+                "return_url": settings.SITE_URL + "offer_paypal_accepted.html",
                 "cancel_url": settings.SITE_URL},
 
             # Transaction -
@@ -76,7 +76,7 @@ class PaypalView(APIView):
                 if link.method == "REDIRECT":
                     url_pago = link.href
         else:
-            raise Exception(pago.error)
+            raise Exception(pago_paypal.error)
 
         return url_pago, pago_paypal
 
@@ -129,6 +129,7 @@ class AcceptPaypalView(APIView):
     def _aceptar_pago_paypal(self, payment_id, payer_id):
         """Aceptar el pago del cliente, actualiza el registro con los datos
         del cliente proporcionados por paypal"""
+        paypalrestsdk.configure({"mode": settings.PAYPAL_MODE,"client_id": settings.PAYPAL_CLIENT_ID,"client_secret": settings.PAYPAL_CLIENT_SECRET, })
         registro_pago = get_object_or_404(OfferPaypalBill, payment_id=payment_id)
         pago_paypal = paypalrestsdk.Payment.find(payment_id)
         if pago_paypal.execute({'payer_id': payer_id}):
@@ -155,6 +156,7 @@ class AcceptPaypalView(APIView):
 
 class PaypalUserPlanPaymentView(APIView):
     def get(self, request, format=None):
+        print("is the paypal_userPlan_payment_getting_to_back?==========")
         if request.method == "GET":
             try:
                 response = {}
@@ -162,6 +164,7 @@ class PaypalUserPlanPaymentView(APIView):
                     dataScientist_user = User.objects.all().get(pk = request.user.id)
                     dataScientist = DataScientist.objects.all().get(user=dataScientist_user)
                 except:
+                    traceback.print_exc()
                     response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: Logged data scientist could not be retrieved.'
                     response['UserCodeErrorMessage'] = 'None.'
                     return JsonResponse(response, safe=False)
@@ -169,6 +172,7 @@ class PaypalUserPlanPaymentView(APIView):
                 try:
                     userPlan_pk = request.GET['userplan_pk']
                 except:
+                    traceback.print_exc()
                     response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: No userPlan_pk was received.'
                     response['UserCodeErrorMessage'] = 'None.'
                     return JsonResponse(response, safe=False)
@@ -176,12 +180,13 @@ class PaypalUserPlanPaymentView(APIView):
                 try:
                     userplan = UserPlan.objects.get(pk=userPlan_pk)
                     assert userplan.dataScientist == dataScientist
-                    userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate')
+                    userPlanHistory = UserPlan.objects.filter(dataScientist=dataScientist).order_by('-expirationDate').order_by('-pk')
                     assert 0 < userPlanHistory.count()
                     userplanPaymentPending = userPlanHistory.first()
 
                     assert userplan == userplanPaymentPending
                 except:
+                    traceback.print_exc()
                     response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: An error ocurred retrieving the user plan to pay.'
                     response['UserCodeErrorMessage'] = 'None.'
                     return JsonResponse(response, safe=False)
@@ -212,8 +217,8 @@ class PaypalUserPlanPaymentView(APIView):
 
                     #Set redirect URLs
                     "redirect_urls": {
-                        "return_url": settings.SITE_URL + "accept_userplan_payment",
-                        "cancel_url": settings.SITE_URL + "cancel_userplan_payment",
+                        "return_url": settings.SITE_URL + "accept_userplan_payment.html",
+                        "cancel_url": settings.SITE_URL + "cancel_userplan_payment.html",
                     },
 
                     # Set transaction object
@@ -273,6 +278,7 @@ class AcceptPaypalUserPlanPayment(APIView):
             payment_id = request.GET.get('paymentId')
             payer_id = request.GET.get('PayerID')
         except:
+            traceback.print_exc()
             raise HttpResponseBadRequest
 
         # Execute payment with the payer ID from the create payment call (following redirect)
@@ -280,8 +286,26 @@ class AcceptPaypalUserPlanPayment(APIView):
 
         if payment.execute({"payer_id": str(payer_id)}):
             print("Payment[%s] execute successfully" % (payment.id))
+            try:
+                userPlan_pk = payment.transactions[0]['item_list']['items'][0]['sku']
+                print("The id of the user_plan is " +  str(userPlan_pk))
+                userPlan = UserPlan.objects.get(pk=userPlan_pk)
+                userPlan.isPayed = True
+                print("The said userplan" + str(userPlan.id))
+                userPlan.save()
+                print("The said userplan" + str(userPlan.isPayed))
+            except:
+                traceback.print_exc()
+                response[
+                    'DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: No userPlan_pk was received.'
+                response['UserCodeErrorMessage'] = 'None.'
+                return JsonResponse(response, safe=False)
+            response['DeveloperErrorMessage'] = 'Pagos.views.PaypalUserPlanPaymentView: Everything went perfect with payment!.'
+            response['MessageCode'] = 'You have paid successfuly'
         else:
             print(payment.error)
+            response['DeveloperErrorMessage'] = 'ERRROOOOR!'
+            response['MessageCode'] = 'ERRROOOOR!'
 
 
-#TODO class CancelPaypalUserPlanPayment(APIView):
+        return JsonResponse(response, safe=False)
